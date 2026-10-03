@@ -1,0 +1,40 @@
+# G1 96-dim RL-observation profile.
+#
+# Observation layout (96 dims):
+#   joint_pos           29
+#   joint_vel           29
+#   projected_gravity    3
+#   base_lin_vel         3
+#   base_ang_vel         3
+#   last_actions        29
+#
+# Terms are already expressed in the sensor/local frame by the RL tracker,
+# so state_normalize is false.
+
+data_profile:
+  name: G1RLObs
+
+  observation:
+    terms:
+      - joint_pos
+      - joint_vel
+      - projected_gravity
+      - base_lin_vel
+      - base_ang_vel
+      - last_actions
+    state_normalize: false
+    state_emph:
+      type: same
+      weights:
+        joint_pos: 1.2
+        joint_vel: 0.9
+        projected_gravity: 3.0
+        base_lin_vel: 2.0
+        base_ang_vel: 2.5
+        last_actions: 0.85
+
+  task_condition:
+    terms: []
+    state_normalize: false
+
+  action_term: act

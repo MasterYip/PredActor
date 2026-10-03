@@ -1,0 +1,20 @@
+dataset:
+  _target_: null                # Dataset class to instantiate (override per experiment)
+  horizon: null                 # Total trajectory length per sample (override by agent horizon in offline_trainer.py)
+  n_obs_steps: null             # Number of past observation steps (override by agent n_past_steps in offline_trainer.py)
+  n_task_steps: 1               # Number of task-condition steps fed to the backbone encoder.
+                                #   n_obs_steps (e.g. 4): full temporal history of conditions.
+                                #   1 (default): only the present-frame condition (text, goal pos, etc.)
+  pad_after: 1                  # Padding frames appended after each episode
+  pad_before: 1                 # Padding frames prepended before each episode
+  seed: 42                      # Random seed for train/val split
+  val_ratio: 0.02               # Fraction of data reserved for validation (2%)
+  symm_aug: true                # Enable symmetric (reflection) augmentation for data variety
+  load_to_memory: true          # Load entire dataset into RAM (faster but more memory).
+                                #   Set false for memory-mapped disk access (slower, low RAM).
+  data_sample_rate: 0.02        # Fraction of data used to fit the normalizer (default 2%).
+                                #   Lower values reduce RAM usage; higher values improve normalizer accuracy.
+  zarr_path: null               # Zarr archive filename inside dataset_dir (override per experiment)
+                                #   e.g. "motion_dyed_text_t0.01.zarr"
+  use_normalizer_cache: false   # Set true to load/save normalizer_stats_*.yaml next to the zarr.
+                                #   Default false: always re-fit from scratch (safe when switching profiles).

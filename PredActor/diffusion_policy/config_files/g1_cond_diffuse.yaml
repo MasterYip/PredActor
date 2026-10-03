@@ -1,0 +1,140 @@
+_target_: diffusion_policy.trainer.offline_trainer.OfflineTrainer
+
+defaults:
+  - defaults/data_collection
+  - defaults/dataloader
+  - defaults/val_dataloader
+  - defaults/ema
+  - defaults/logging_base
+  - defaults/optimizer
+  - defaults/policy/cond_codiffuse
+  - defaults/dataset/base
+  - defaults/training
+  - defaults/checkpoint
+  - defaults/env_runner
+  - defaults/env/mujoco
+  - _self_
+
+exp_name: null
+output_dir: "./outputs/"
+dataset_dir: "unused-evaluation-only"
+
+logging:
+  group: null
+  id: null
+  mode: online
+  name: 'velocity_loss_1'
+  project: diffuse_cloc
+  resume: true
+  tags:
+  - velocity_1
+  - default
+
+policy:
+  # ---------------------------------------------------------------------------
+  # CondCompressor (optional): trainable MLP to compress CLIP condition 512→64.
+  # Uncomment and set enable: true to activate.  When enabled, backbone cond_dim
+  # MUST be changed to match output_dim (64, or 128 with task mask).
+  # ---------------------------------------------------------------------------
+  # cond_compressor:
+  #   enable: true
+  #   input_dim: 512
+  #   output_dim: 64
+  #   hidden_dim: 128
+  #   num_layers: 2
+  #   activation: "mish"
+  #   dropout: 0.0
+  condition_dropout_config:
+    enable: false
+
+  actor:
+    enable_root_pos_guide: false
+    whole_body_guidance_config:
+      enabled: true
+      profile: g1_standard
+      guidance_mode: classifier   # "classifier" (paper-correct) or "pd" (legacy)
+      mode: simple               # "simple" (fast) or "integration" (accurate but slower)
+      enable_zeta_comp: false     # false: legacy single-level zeta for DDIM jumps
+      enable_damping_comp: false  # false: legacy projected-gradient damping
+      # World-frame destination follow is disabled by default and can be
+      # enabled from the cond-eval web UI without changing checkpoint shapes.
+      destination_follow_config:
+        enabled: false
+        kp_x: 2.0
+        kp_y: 0.8
+        kp_w: 6.0
+        vx_range: [0.0, 8.0]
+        vy_range: [-1.0, 1.0]
+        wz_range: [-10.0, 10.0]
+        heading_dead_zone: 0.01
+        arrival_radius: 0.30
+        rearm_radius: 0.60
+      gui:
+        enabled: true
+      # Each controlled DOF is an independent guidance with its own activation set.
+      guidances:
+        vx_guide:
+          enabled: true
+          kp: 1.0
+          range: [-10.0, 10.0]
+          body_groups:
+            guided: [pelvis_torso]
+        vy_guide:
+          enabled: true
+          kp: 1.0
+          range: [-10.0, 10.0]
+          body_groups:
+            guided: [torso]
+        wz_guide:
+          enabled: true
+          kp: 1.0
+          range: [-5.0, 5.0]
+          body_groups:
+            guided: [torso]
+        hz_guide:
+          enabled: true
+          kp: 1.0
+          z_init: 0.75
+          z_range: [0.3, 1.1]
+          body_groups:
+            guided: [torso]
+        left_wrist_guide:
+          enabled: false
+          kp: 1.0
+          dx_range: [-0.5, 0.5]
+          dy_range: [-0.5, 0.5]
+          dz_range: [-0.3, 0.3]
+          body_groups:
+            guided: [wrist]
+        right_wrist_guide:
+          enabled: false
+          kp: 1.0
+          dx_range: [-0.5, 0.5]
+          dy_range: [-0.5, 0.5]
+          dz_range: [-0.3, 0.3]
+          body_groups:
+            guided: [wrist]
+    backbone:
+      x_input_dim: 384
+      x_output_dim: 384
+    data_profile: g1_standard
+
+dataset:
+  _target_: diffusion_policy.dataset.g1_dataset.G1Dataset
+  data_profile: g1_standard
+  zarr_path: motion_dyed_text_t0.01.zarr
+  data_sample_rate: 0.013
+
+training:
+  resume_path: null
+  num_epochs: 50
+
+# Evaluation runner configuration (for cond_eval.py)
+env_runner:
+  task_cond_providers:
+    clip_teleop:
+      enabled: false
+      default_text: "stand"
+    clip_interp:
+      enabled: true
+

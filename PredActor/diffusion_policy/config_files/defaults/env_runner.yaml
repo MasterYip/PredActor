@@ -1,0 +1,133 @@
+env_runner:
+  _target_: diffusion_policy.env_runner.env_runner.EnvRunner
+  output_dir: null              # Set automatically by eval.py
+  max_steps: 1000000            # Maximum control steps per evaluation episode
+  n_obs_steps: 4                # Number of observation history steps fed to the policy
+  delay_action_step: 0.0        # Signed offset; fractions blend clean adjacent action slots
+  device: null                  # Inference device (null = use policy device)
+  tqdm_interval_sec: 5.0        # Progress bar refresh interval (seconds)
+  realtime_mode: false          # Enforce real-time pacing (for hardware deployment)
+  reset_height: 0.2             # Root height offset applied on env reset (metres)
+  control_dt: 0.02              # Control loop period in seconds (1/control_dt = Hz)
+
+  env: null                     # Environment config (override with defaults/env/isaaclab, mujoco, or unitree_sdk)
+
+  # ---------------------------------------------------------------------------
+  # Dataset class for observation normalisation
+  # Auto-detected from policy x_input_dim when null.
+  # Explicit options: "G1_Dataset", "G1_Dataset_RLObs", "G1_Dataset_PRDP", etc.
+  # ---------------------------------------------------------------------------
+  dataset_class: null
+
+  # ---------------------------------------------------------------------------
+  # Robot visualisation debugger (sim2sim alignment tool)
+  # Renders a real-time 3-D skeleton with body positions/velocities.
+  # ---------------------------------------------------------------------------
+  enable_debugger: false        # Set to true to open the debugger window
+  debugger_config:
+    history_length: 40          # Number of frames to keep in trajectory history
+    update_interval: 2          # Redraw every N control frames (1 = every frame)
+    show_velocities: true       # Overlay velocity arrows on robot bodies
+    show_root_states: true      # Show root position/rotation/ang-vel subplot
+    vel_scale: 0.1              # Scale factor for velocity arrow length
+    save_frequency: "never"     # Frame saving: "never", "on_close", "every_n_frames"
+    save_every_n: 100           # Save every N frames (only if save_frequency="every_n_frames")
+
+  # ---------------------------------------------------------------------------
+  # Task condition providers — any combination can be enabled simultaneously.
+  # Enabled providers are instantiated and combined via CompositeCondProvider.
+  # Override individual provider params or the enabled flag in each config file.
+  #
+  # Example — enable only interp (override in your config):
+  #   env_runner:
+  #     task_cond_providers:
+  #       clip_teleop:
+  #         enabled: false
+  #       clip_interp:
+  #         enabled: true
+  #
+  # Example — add motion reference alongside CLIP (postext config):
+  #   env_runner:
+  #     task_cond_providers:
+  #       moref_teleop:
+  #         enabled: true
+  # ---------------------------------------------------------------------------
+  task_cond_providers:
+
+    # CLIP teleop — interactive text prompts entered at runtime
+    clip_teleop:
+      enabled: true
+      _target_: diffusion_policy.task_provider.CLIPTeleop
+      device: "cuda:0"            # Device for the CLIP encoder
+      cond_dim: 512               # Must match policy backbone cond_dim
+      default_text: "stand"       # Initial text prompt shown on startup
+      clip_model_name: "ViT-B/32" # Fallback when checkpoint_path is null
+      clip_training: ""           # "" = frozen; "text" = fine-tune text encoder
+      clip_layers: 12             # Number of Transformer layers in CLIP
+      checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT}"
+                                  # Complete CLIP state (null = load clip_model_name)
+
+    # CLIP interpolation — semantic blending GUI with slider controls
+    clip_interp:
+      enabled: false
+      _target_: diffusion_policy.task_provider.CLIPInterp
+      device: "cuda:0"            # Device for the CLIP encoder
+      cond_dim: 512               # Must match policy backbone cond_dim
+      clip_model_name: "ViT-B/32" # CLIP model variant
+      clip_training: ""           # "" = frozen
+      clip_layers: 12             # Number of Transformer layers in CLIP
+      checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT}"
+      normalize: true             # Normalise final embedding to unit norm
+      text_pairs:                 # Pairs of text prompts for each interpolation slider
+        - [null, "stand"]
+        - ["stand", "walk"]
+        - ["walk", "run"]
+        - ["stand", "squat down"]
+        - ["get down", "raise hand"]
+
+    # Motion reference teleop — GUI sliders for task-condition 3-D vectors.
+    # Supports one or more named terms; each term gets its own labelled slider
+    # group.  Required when the dataset profile includes ref_root_lin_vel_local,
+    # ref_root_ang_vel_local, or similar cond terms injected via the GUI.
+    #
+    # ``terms`` is a list of dicts with keys:
+    #   name        — raw-key name written into next_terms (must match dataset profile)
+    #   label       — section heading shown in the GUI window
+    #   dim_labels  — three axis labels (e.g. ["vx","vy","vz"])
+    #   ranges      — three [min, max] pairs, one per axis
+    #   inits       — three initial values, one per axis
+    #
+    # Backward-compatible single-term shorthand (deprecated):
+    #   x_range, y_range, z_range, z_init — maps to a single ref_root_lin_vel_local term.
+    
+    
+    # Whole-body guidance — term-based kinematic model (vx, vy, wz).
+    # Applied DURING diffusion denoising (not via inject_raw_keys).
+    # Uses ObsTermIndex to locate observation terms in the flat state vector.
+    # Configure on the POLICY actor, not here.  Example:
+    #   policy:
+    #     actor:
+    #       whole_body_guidance_config:
+    #         enabled: true
+    #         profile: g1_standard
+    #         guidances:
+    #           - type: wholebody_pos_vel_guide
+    #             terms: [body_pos_local, body_lin_vel_local,
+    #                     root_pos_local, root_lin_vel_local,
+    #                     root_rot_local, root_ang_vel_local]
+    #         gui:
+    #           enabled: true
+    #         kp_init: 1.0
+    #         vx_range: [-5.0, 5.0]
+    #         vy_range: [-4.0, 4.0]
+    #         wz_range: [-2.0, 2.0]
+
+    moref_teleop:
+      enabled: false
+      _target_: diffusion_policy.task_provider.MoRefTeleop
+      terms:
+        - name: ref_root_lin_vel_local
+          label: "Root Position / Lin Vel"
+          dim_labels: ["X", "Y", "Z"]
+          ranges: [[-5.0, 5.0], [-5.0, 5.0], [0.0, 1.5]]
+          inits: [0.0, 0.0, 0.75]

@@ -1,0 +1,45 @@
+env_runner:
+  env:
+    _target_: diffusion_policy.env.mujoco_env.MuJoCoG1Env
+    config:
+      control_dt: 0.02              # Control loop period in seconds (50 Hz)
+      simulation_dt: 0.002          # Physics simulation timestep (500 Hz); control_dt must be a multiple
+      num_dof: 29                   # Robot degrees of freedom (G1 full body = 29)
+      xml_path: "${oc.env:PREDACTOR_ROOT,.}/assets/unitree_description/mjcf/g1_act.xml"
+                                    # Path to G1 MuJoCo MJCF model
+      enable_viewer: true           # Open the MuJoCo viewer window
+      camera_follow: true           # Keep the camera centered on the robot root while it moves
+      camera_follow_body: "pelvis"  # G1 root body, resolved by name (not numeric ID)
+      camera_lookat_offset: [0.0, 0.0, 0.0]
+      camera_lookat_height_offset: -0.05
+                # Small vertical offset so the camera centers near the torso
+      camera_distance: 3.0          # Viewer camera distance from the lookat point
+      camera_azimuth: 0.0           # Viewer azimuth in degrees
+      camera_elevation: -20.0       # Viewer elevation in degrees
+      camera_follow_yaw: false      # false = world-fixed heading; true = follow pelvis yaw
+      camera_smoothing_tau: 0.15    # seconds; 0 disables damping
+      # ---------------------------------------------------------------------------
+      # Forward Kinematics (FK) body-state computation
+      # use_fk=true:  compute body states via FK from joint angles (more accurate)
+      # use_fk=false: extract body states directly from MuJoCo (faster, minor differences)
+      # ---------------------------------------------------------------------------
+      use_fk: true
+      urdf_path: "${oc.env:PREDACTOR_ROOT,.}/assets/unitree_description/urdf/g1/main.urdf"
+                                    # Path to G1 URDF (required when use_fk=true)
+      fk_calculator_type: "pinocchio"  # FK backend: "pinocchio" (single-sample) or "torch" (batch-capable)
+      fk_device: "cuda:0"           # Device for torch FK backend (ignored for pinocchio)
+      # ---------------------------------------------------------------------------
+      # PD Controller Gains — 29 DOF G1 robot (stiffness Kp, damping Kd)
+      # Joint order: left/right hip-roll, hip-pitch, hip-yaw, knee, ankle-pitch, ankle-roll,
+      #              waist, left/right shoulder-pitch, shoulder-roll, shoulder-yaw, elbow, wrist-roll, wrist-pitch
+      # ---------------------------------------------------------------------------
+      Kp: [40.17923847137318, 99.09842777666113, 40.17923847137318, 99.09842777666113, 28.50124619574858, 28.50124619574858,
+            40.17923847137318, 99.09842777666113, 40.17923847137318, 99.09842777666113, 28.50124619574858, 28.50124619574858,
+            40.17923847137318, 28.50124619574858, 28.50124619574858, 14.25062309787429, 14.25062309787429, 14.25062309787429,
+            14.25062309787429, 14.25062309787429, 16.77832748089279, 16.77832748089279, 14.25062309787429, 14.25062309787429,
+            14.25062309787429, 14.25062309787429, 14.25062309787429, 16.77832748089279, 16.77832748089279]
+      Kd: [2.5578897650279457, 6.3088018534966395, 2.5578897650279457, 6.3088018534966395, 1.814445686584846, 1.814445686584846,
+            2.5578897650279457, 6.3088018534966395, 2.5578897650279457, 6.3088018534966395, 1.814445686584846, 1.814445686584846,
+            2.5578897650279457, 1.814445686584846, 1.814445686584846, 0.907222843292423, 0.907222843292423, 0.907222843292423,
+            0.907222843292423, 0.907222843292423, 1.06814150219, 1.06814150219, 0.907222843292423, 0.907222843292423,
+            0.907222843292423, 0.907222843292423, 0.907222843292423, 1.06814150219, 1.06814150219]

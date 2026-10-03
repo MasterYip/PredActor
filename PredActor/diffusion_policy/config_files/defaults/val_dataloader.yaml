@@ -1,0 +1,6 @@
+val_dataloader:
+  batch_size: 512
+  num_workers: 1
+  persistent_workers: false
+  pin_memory: true
+  shuffle: false

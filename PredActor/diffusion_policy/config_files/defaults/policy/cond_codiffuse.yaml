@@ -1,0 +1,106 @@
+policy:
+  _target_: diffusion_policy.agent.bc_agent.BCAgent
+
+  # ---------------------------------------------------------------------------
+  # CondCompressor: trainable MLP to compress normalized conditions before
+  # dropout and task mask.  Reduces [B,T,input_dim] → [B,T,output_dim].
+  # When enabled, backbone cond_dim MUST equal output_dim (or 2×output_dim
+  # if task mask is used, since the mask doubles the compressed dim).
+  # Parameters are trained end-to-end via backpropagation from the diffusion
+  # loss and are saved in checkpoints automatically.
+  # ---------------------------------------------------------------------------
+  # cond_compressor:
+  #   enable: false
+  #   input_dim: 512            # Raw CLIP embedding dimension
+  #   output_dim: 64            # Compressed dimension (fully configurable)
+  #   hidden_dim: 128           # Hidden layer size (default: max(output_dim, 2*input_dim//3))
+  #   num_layers: 2             # Number of Linear layers
+  #   activation: "mish"        # "mish" | "relu" | "gelu"
+  #   dropout: 0.0              # Optional dropout between layers
+
+  # ---------------------------------------------------------------------------
+  # Adaptive Conditional Dropout
+  # Improves policy robustness to condition variations (classifier-free guidance)
+  # Reference: Ho & Salimans, "Classifier-Free Diffusion Guidance" (NeurIPS 2022)
+  # ---------------------------------------------------------------------------
+  condition_dropout_config:
+    enable: true                # Enable/disable adaptive condition dropout
+    initial_prob: 0.1           # Dropout probability at the start of training
+    final_prob: 0.5             # Dropout probability after warmup completes
+    warmup_steps: 200000        # Steps to linearly interpolate from initial to final prob
+    dropout_type: "noise"       # Strategy: "null" (zero out), "noise" (add Gaussian), "dimensions" (per-dim mask)
+    noise_std: 0.2              # Std dev of Gaussian noise (only for dropout_type="noise")
+    seed: 0                     # Random seed for reproducibility
+    clip_latent_dim: 0          # If > 0 and cond_dim > clip_latent_dim, only the trailing
+                                #   clip_latent_dim dims (CLIP part) are dropped; RL obs dims stay clean.
+                                #   Set to 512 for PRDP-style cond (96 RL obs + 512 CLIP).
+
+  actor:
+    _target_: diffusion_policy.modules.diffuse_cloc.DiffuseCLoC
+    backbone:
+      _target_: diffusion_policy.backbone.transformer_codiffuse.Transformer
+      x_horizon: 20             # Prediction horizon for x (body state) trajectory
+      y_horizon: 20             # Prediction horizon for y (action) trajectory
+      x_input_dim: null         # Per-step state input dim (e.g. 64 for PRDP, 384 for G1_Dataset)
+      y_input_dim: 29           # Per-step action input dim (joint targets, 29 for G1)
+      x_output_dim: null        # Per-step state output dim (must match x_input_dim)
+      y_output_dim: 29          # Per-step action output dim (must match y_input_dim)
+      n_emb: 256                # Transformer embedding dimension
+      n_head: 4                 # Number of attention heads
+      n_layer: 2                # Number of Transformer decoder layers
+      causal_attn: true         # Use causal (autoregressive) attention in main sequence
+      x_to_x_attn: full        # Attention pattern within x tokens: "full" or "causal" or "no_attn"
+      x_to_y_attn: no_attn     # Attention from y tokens attending to x tokens
+      y_to_x_attn: causal      # Attention from x tokens attending to y tokens
+      y_to_y_attn: causal      # Attention within y tokens
+      # ---------------------------------------------------------------------------
+      # Conditioning (optional motion semantic control via MotionCLIP / RL obs)
+      # Requires a dyed dataset with motion_latent field (see data_dyeing.py).
+      # cond_dim: per-step feature size of the conditioning vector.
+      #   - 0 or null: no conditioning
+      #   - 512: CLIP-only conditioning (one latent per n_cond_steps)
+      #   - 608: PRDP-style (96-dim RL obs + 512-dim CLIP per step, n_cond_steps=4)
+      # n_cond_steps: number of conditioning tokens fed to the Transformer encoder.
+      #   - 1: present-frame CLIP latent only
+      #   - 4: 4-step history (matches n_past_steps for PRDP)
+      # n_cond_layers: encoder depth for condition tokens.
+      #   - 0: single linear projection (MLP)
+      #   - >0: Transformer encoder with that many layers
+      # ---------------------------------------------------------------------------
+      cond_dim: 512             # Per-step conditioning feature size (set 0 to disable)
+      n_cond_steps: 1           # Number of conditioning timesteps
+      n_cond_layers: 0          # Encoder layers for condition (0 = MLP, >0 = Transformer)
+      cond_causal_attn: false   # Causal attention in condition encoder (usually false)
+      # ---------------------------------------------------------------------------
+      # Windowed cross-attention: limits which future frames cond tokens attend to.
+      # null = global (all 20 steps).  window = n_past + N_future steps.
+      #   8 → 4past+8future=12, 4→4past+4future=8, 2→4past+2future=6, 0→4past only.
+      # ---------------------------------------------------------------------------
+      # cross_attn_window: null  # uncomment to enable windowed cross-attention
+      # cross_attn_mode: "full"# "full" | "state" | "action" | "no_attn"
+      #   full:    both x (state) and y (action) tokens cross-attend to condition
+      #   state:   only x (state) tokens cross-attend; y decoded from self-attn with x
+      #   action:  only y (action) tokens cross-attend; x decoded from self-attn with y
+      #   no_attn: no cross-attention — condition only used during training
+
+    denoising_steps: 20         # Number of DDPM denoising steps at inference
+    predict_epsilon: false      # Predict noise (true) or clean sample (false)
+    denoised_clip_value: 1.0    # Clip denoised sample to [-value, value] during inference
+    action_weight_schedule: constant-to-8  # Loss weighting schedule for action vs state
+    clean_past_state: true      # [training-time] zero-out noise on already-observed state frames (training only)
+    no_state_override: false    # [inference-time] when true: denoise x-stream from condition, skip nobs inpainting (no effect on training)
+                                #   The past state is NOT overwritten with env observation.
+                                #   The entire x-stream (20 steps) is denoised from condition.
+                                #   Requires cond stream to contain rlobs for proprioception.
+                                #   Independent of clean_past_state (which is training-time only).
+    clean_past_action: false    # Zero-out noise on already-executed action frames
+    n_past_steps: 4             # Number of history observation steps fed as context
+    state_emphasis: null        # Emphasis mode name (e.g. "g1prdp_emph"); null = identity
+    state_proj: true            # Use linear projection layer on state input
+    randomize_noise_schedule: true  # Enable Rolling Diffusion (randomize per-step noise level)
+    # DDIM acceleration: run fewer denoising steps at inference
+    # ddim_steps: null  → standard Rolling Diffusion DDPM (default)
+    # ddim_steps: 5     → DDIM with 5 steps (4× faster, no rolling buffer)
+    ddim_steps: null
+    ddim_eta: 0.0       # 0.0 = fully deterministic DDIM; 1.0 ≈ DDPM stochasticity
+    use_ns_ddim: false  # [DEBUG] use NoiseScheduler.ddim_step for cross-validation

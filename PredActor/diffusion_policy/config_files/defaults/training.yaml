@@ -1,0 +1,21 @@
+training:
+  checkpoint_every: 10          # Save a checkpoint every N epochs
+  debug: false                  # Enable debug mode (extra logging, skip rollouts)
+  device: cuda:0                # Training device (e.g. "cuda:0", "cpu")
+  precision: fp32               # fp32 (default) or CUDA autocast fp16
+  gradient_accumulate_every: 1  # Accumulate gradients over N batches before stepping optimizer
+  lr_scheduler: cosine          # Learning rate schedule: "cosine", "linear", or "constant"
+  lr_warmup_steps: 10000        # Number of steps for linear LR warmup at start
+  max_train_steps: null         # Maximum training steps per epoch (null = full epoch)
+  max_val_steps: null           # Maximum validation steps per epoch (null = full validation)
+  num_epochs: 400               # Total number of training epochs
+  resume: false                 # Resume from checkpoint (set resume_path to load from specific path)
+  resume_path: null             # Path to checkpoint file to resume from (null = latest)
+  rollout_every: 10             # Run rollout evaluation every N epochs (0 = disabled)
+  rollout_steps: 200            # Number of steps per rollout episode
+  sample_every: 3               # Log sample predictions every N epochs
+  save_terminal_checkpoint: false  # Opt in to a synchronous latest.ckpt after the final epoch
+  seed: 42                      # Random seed for reproducibility
+  tqdm_interval_sec: 1.0        # Refresh interval for tqdm progress bar (seconds)
+  use_ema: true                 # Use Exponential Moving Average of model weights for evaluation
+  val_every: 10                 # Run validation every N epochs

@@ -1,0 +1,11 @@
+data_collection:
+  name: null
+  record_steps: 1000000
+  noisy_state_clean_action:
+    enable: true
+    std_scale: 1.
+  perturbation_bodies:
+    enable: false
+    force_range: 0.
+    torque_range: 0.
+  perfect_expert_only: true
