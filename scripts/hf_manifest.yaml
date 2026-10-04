@@ -9,6 +9,34 @@ endpoint: https://huggingface.co
 private: false
 
 entries:
+  - hf_path: assets
+    local_path: Artifacts/assets
+    kind: directory
+    enabled: true
+    notes: Model-card banner, overview, logos, and institutional marks
+    files:
+      institution-strip.svg:
+        size_bytes: 729397
+        sha256: 7323b48524194780143ae01b964411dad53232f3a0b4d0565ecdb02f7f21b2ed
+      predactor-icon-on-dark.svg:
+        size_bytes: 1947
+        sha256: 2d7b37863d7e523a3b720a7a110775db0e89a7441126363390cd428b0dc4837b
+      predactor-icon-on-light.svg:
+        size_bytes: 1947
+        sha256: 9799555370986c05405dccd6f65eaf5f8181e1ca9200e299cb0fc8c9bf409a14
+      predactor-preview.png:
+        size_bytes: 2551014
+        sha256: 6d9f0b631c1e902141479d053147553e5a0b6af4244234b79d7e12e4191d2767
+      predactor-readme-banner.svg:
+        size_bytes: 7321
+        sha256: 9e3ef96847f05bc7b1ad56d4a3de13c6e5e4adb91e3003cb78bf9c36e5715574
+      predactor-wordmark-on-dark.svg:
+        size_bytes: 2905
+        sha256: f8432dac695634c584c24adb505272fdc5f54ec1b069124896f94e6bcfbb6558
+      predactor-wordmark-on-light.svg:
+        size_bytes: 2904
+        sha256: e52fe30f0540d171cff8ef4054547bacb3144054b8219c6c5b0b3d4125b35a46
+
   - hf_path: README.md
     local_path: Artifacts/README.md
     kind: file

@@ -33,47 +33,6 @@ from _hf_common import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REPO_TYPE = "model"
 
-README_TEMPLATE = """\
----
-license: other
-task_categories:
-- robotics
-language:
-- en
-tags:
-- robot
-- motion
-- diffusion-policy
-- g1
-- humanoid
-pretty_name: PredActor Artifacts
----
-
-# PredActor Artifacts
-
-Evaluation checkpoints for [PredActor](https://github.com/MasterYip/PredActor).
-
-## Repository Layout
-
-```
-checkpoints/
-  predactor/pdp051/latest.ckpt
-  motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar
-
-dataset/                Reserved for future releases
-```
-
-## Download
-
-```bash
-pip install huggingface_hub
-python scripts/hf_download.py --filter checkpoints
-```
-
-See `scripts/hf_manifest.yaml` for the explicit local-to-remote mappings.
-"""
-
-
 def cmd_status(api, repo_id, manifest):
     print(f"Sync status  [{repo_id}]\n{'='*64}")
     try:
@@ -154,11 +113,9 @@ def cmd_readme(api, repo_id, from_file=None):
     print(f"Updating README for {repo_id} ...")
     try:
         from huggingface_hub import CommitOperationAdd
-        if from_file:
-            content = Path(from_file).read_bytes()
-            print(f"  Using content from {from_file}")
-        else:
-            content = README_TEMPLATE.encode()
+        source = Path(from_file) if from_file else REPO_ROOT / "Artifacts" / "README.md"
+        content = source.read_bytes()
+        print(f"  Using content from {source}")
         api.create_commit(
             repo_id=repo_id, repo_type=REPO_TYPE,
             commit_message="Update README card",
@@ -329,8 +286,8 @@ def main():
     readme_p = sub.add_parser("readme", help="Push/update the repo README card")
     readme_p.add_argument(
         "--from-file", default=None, metavar="PATH",
-        help="Use this markdown file as README (default: built-in template). "
-             "E.g. PDPlanner/doc/hf_model_card.md"
+        help="Use this markdown file as README "
+             "(default: Artifacts/README.md from the sync layout)."
     )
 
     graph_p = sub.add_parser("graph", help="Print the commit history graph")
