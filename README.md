@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://masteryip.github.io/predactor.github.io/"><img alt="Project website" src="https://img.shields.io/badge/Project_Website-E7A12B?style=for-the-badge&logo=googlechrome&logoColor=171817"></a>
   <a href="#demos"><img alt="Demo videos" src="https://img.shields.io/badge/Demo_Videos-7895A6?style=for-the-badge&logo=youtube&logoColor=white"></a>
-  <img alt="Code release coming soon" src="https://img.shields.io/badge/Code-Coming_Soon-5A5A57?style=for-the-badge">
+  <a href="#quick-evaluation"><img alt="Evaluation code available" src="https://img.shields.io/badge/Code-Evaluation_Release-5A5A57?style=for-the-badge"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-ECECEA?style=for-the-badge&labelColor=2F2F2D&color=ECECEA"></a>
 </p>
 
@@ -18,7 +18,108 @@
 </p>
 
 > [!IMPORTANT]
-> This repository currently provides the project overview and public demo links. Source code, trained checkpoints, and setup instructions are not available yet and will be added in a future release.
+> This release supports browser-based and bounded MuJoCo evaluation of the
+> published PDP051 checkpoint. Training, IsaacLab data collection, and robot
+> deployment are not part of the public evaluation interface.
+
+## Quick evaluation
+
+The supported path uses Python 3.10 on Linux. It runs directly from the
+checkout and does not require Isaac Sim, RLTracker, training data, or an
+editable package install.
+
+```bash
+git clone https://github.com/MasterYip/PredActor.git
+cd PredActor
+
+conda create -n predactor-eval python=3.10 pip -y
+conda activate predactor-eval
+python -m pip install --upgrade pip
+python -m pip install setuptools==74.0.0
+python -m pip install torch==2.5.1 torchvision==0.20.1 \
+  --index-url https://download.pytorch.org/whl/cpu
+python -m pip install --no-build-isolation -r PredActor/requirements-eval.txt
+```
+
+For NVIDIA acceleration, replace the PyTorch index URL with
+`https://download.pytorch.org/whl/cu121`.
+
+Download the PredActor and fine-tuned MotionCLIP checkpoints from the public
+[artifact repository](https://huggingface.co/MasterYip/PredActor_Artifacts).
+The helper recreates the published layout under the Git-ignored
+`./Artifacts/` directory and verifies the checkpoint byte sizes and SHA-256
+identities.
+
+```bash
+python scripts/hf_download.py --filter checkpoints
+```
+
+Launch the browser-based MuJoCo evaluation from the repository root:
+
+```bash
+export PREDACTOR_ROOT="$PWD/PredActor"
+export PREDACTOR_TEXT_CHECKPOINT="$PWD/Artifacts/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar"
+
+python PredActor/cond_eval.py \
+  --checkpoint "$PWD/Artifacts/checkpoints/predactor/pdp051/latest.ckpt" \
+  --config g1prdp_cond_diffuse.yaml \
+  --output_dir "$PWD/eval_output/web" \
+  --device cpu --fk-device cpu --headless \
+  --web-ui --web-host 127.0.0.1 --web-port 8765
+```
+
+The command opens `http://127.0.0.1:8765/` automatically. `--headless`
+disables the native MuJoCo window; simulation and rendering still run in the
+browser. On an NVIDIA system, use `--device cuda:0 --fk-device cuda:0` for GPU
+inference.
+
+The local-to-remote directory map is explicit in
+[`scripts/hf_manifest.yaml`](scripts/hf_manifest.yaml). Maintainers can inspect
+the map and remote state or preview an upload without changing the Hub:
+
+```bash
+python scripts/hf_download.py --list
+python scripts/hf_manage.py status
+python scripts/hf_upload.py --dry-run
+```
+
+For a finite command-line integration check, also download the OpenAI CLIP
+ViT-B/32 base weights used by the bounded evaluator:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+import clip
+
+cache = Path.home() / ".cache" / "clip"
+clip.load("ViT-B/32", device="cpu", download_root=str(cache))
+print(cache / "ViT-B-32.pt")
+PY
+```
+
+Then run the bounded headless smoke test:
+
+```bash
+ARTIFACTS="$PWD/Artifacts"
+CLIP_BASE="$HOME/.cache/clip/ViT-B-32.pt"
+cd PredActor
+
+python predactor_eval.py \
+  --checkpoint "$ARTIFACTS/checkpoints/predactor/pdp051/latest.ckpt" \
+  --checkpoint-sha256 2d963b32786f2989c6472726df9fcfe6b385590127e12e1f549a4b7d77488b2e \
+  --clip-checkpoint "$ARTIFACTS/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar" \
+  --clip-checkpoint-sha256 66a127df4958b346089b2020f2705c7456d9db0ee8b4bd9518608b708b35fc3c \
+  --clip-base "$CLIP_BASE" \
+  --clip-base-sha256 40d365715913c9da98579312b702a82c18be219cc2a73407c4526f58eba950af \
+  --output "/tmp/predactor-smoke-$(date +%s)" \
+  --steps 100 --device cpu --text stand
+```
+
+Success ends with `PREDACTOR_EVAL_PASS 100 steps` and writes
+`validation.json` plus the resolved runtime config beneath the selected output
+directory. This is an integration smoke test, not a locomotion-quality or
+robot-safety claim. Add `--viewer`, increase `--steps`, and select an available
+CUDA device for an interactive MuJoCo run.
 
 ## Overview
 
@@ -88,13 +189,17 @@ Click any preview to open the corresponding MP4 video. Videos are hosted by the 
 | Resource | Description |
 | --- | --- |
 | [Project website](https://masteryip.github.io/predactor.github.io/) | Method overview, figures, authorship, and the complete demo gallery |
-| [Public repository](https://github.com/MasterYip/PredActor) | Official release channel for future code and model updates |
+| [Public repository](https://github.com/MasterYip/PredActor) | MuJoCo evaluation code and release updates |
+| [Evaluation artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts) | Hash-pinned PDP051 policy and G1 MotionCLIP checkpoints |
 | [Demo collection](https://masteryip.github.io/predactor.github.io/#evidence) | Simulation and hardware evidence in the browser |
 | Paper and citation | Coming soon |
 
-## Release status
+## Release scope
 
-The public release is being prepared. This README will be expanded with installation, model, data, and evaluation instructions when the implementation is ready. Please use the project website and this repository as the canonical public resources in the meantime.
+The public package contains the evaluation code and G1 assets required for the
+MuJoCo paths above. Learned weights remain in the separate Hugging Face
+artifact repository. Training, dataset generation, experiment orchestration,
+IsaacLab integration, and hardware control are intentionally excluded.
 
 ## License
 
