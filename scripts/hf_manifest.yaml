@@ -1,0 +1,48 @@
+# PredActor artifact synchronization map.
+#
+# local_path is resolved relative to the public Git repository root. The
+# default layout keeps learned weights in the Git-ignored Artifacts directory.
+
+repo_id: MasterYip/PredActor_Artifacts
+repo_type: model
+endpoint: https://huggingface.co
+private: false
+
+entries:
+  - hf_path: README.md
+    local_path: Artifacts/README.md
+    kind: file
+    enabled: true
+    notes: Hugging Face model card
+
+  - hf_path: SHA256SUMS
+    local_path: Artifacts/SHA256SUMS
+    kind: file
+    enabled: true
+    notes: Published artifact checksums
+
+  - hf_path: checkpoints/predactor/pdp051
+    local_path: Artifacts/checkpoints/predactor/pdp051
+    kind: directory
+    enabled: true
+    notes: PredActor PDP051 text-conditioned policy checkpoint
+    files:
+      latest.ckpt:
+        size_bytes: 49212894
+        sha256: 2d963b32786f2989c6472726df9fcfe6b385590127e12e1f549a4b7d77488b2e
+
+  - hf_path: checkpoints/motionclip/g1-model-xyz-clip
+    local_path: Artifacts/checkpoints/motionclip/g1-model-xyz-clip
+    kind: directory
+    enabled: true
+    notes: Fine-tuned G1 MotionCLIP checkpoint
+    files:
+      checkpoint_0100.pth.tar:
+        size_bytes: 542749069
+        sha256: 66a127df4958b346089b2020f2705c7456d9db0ee8b4bd9518608b708b35fc3c
+
+  - hf_path: dataset
+    local_path: Artifacts/dataset
+    kind: directory
+    enabled: true
+    notes: Reserved for future public datasets
