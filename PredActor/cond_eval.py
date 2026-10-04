@@ -6,8 +6,8 @@ with one runner implementation orchestrating env/composer/agent interaction.
 Different environments are selected by changing the nested `env` target in `env_runner`.
 
 Usage:
-    # Evaluate with env_runner section from config
-    python cond_eval.py --checkpoint outputs/latest.ckpt --config g1_cond_diffuse.yaml -o eval_output
+    # Launch the public release with its default artifacts and Web UI
+    predactor-eval
 
     # Use an absolute path (e.g. a wandb config.yaml or a saved checkpoint config)
     python cond_eval.py --checkpoint checkpoints/20260130_run/latest.ckpt \\
@@ -68,6 +68,17 @@ from diffusion_policy.task_provider import (
     CompositeCondProvider,
 )
 from diffusion_policy.task_provider.clip_proposition import terms_from_pairs
+
+
+EVALUATOR_ROOT = Path(__file__).resolve().parent
+REPOSITORY_ROOT = EVALUATOR_ROOT.parent
+DEFAULT_ARTIFACTS_ROOT = REPOSITORY_ROOT / 'Artifacts'
+DEFAULT_CHECKPOINT = DEFAULT_ARTIFACTS_ROOT / 'checkpoints' / 'predactor' / 'pdp051' / 'latest.ckpt'
+DEFAULT_TEXT_CHECKPOINT = (
+    DEFAULT_ARTIFACTS_ROOT / 'checkpoints' / 'motionclip' / 'g1-model-xyz-clip' / 'checkpoint_0100.pth.tar')
+DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / 'eval_output' / 'web'
+DEFAULT_CONFIG = 'g1prdp_cond_diffuse.yaml'
+DEFAULT_DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 
 def _is_dagger_checkpoint(payload):
@@ -227,17 +238,20 @@ def _apply_runtime_overrides(cfg, runner_cfg, device=None, headless=None, fk_dev
 
 
 @click.command()
-@click.option('-c', '--checkpoint', required=True, help='Path to checkpoint file')
+@click.option('-c', '--checkpoint', default=str(DEFAULT_CHECKPOINT), show_default=True,
+              help='Path to checkpoint file')
 @click.option(
-    '--config', required=True,
+    '--config', default=DEFAULT_CONFIG, show_default=True,
     help=(
         'Evaluation/runtime config with env_runner configuration '
         '(e.g., g1prdp_diffuse.yaml). DAgger weights and normalizers still '
         'come from the checkpoint.'
     ),
 )
-@click.option('-o', '--output_dir', required=True, help='Output directory for results')
-@click.option('-d', '--device', default='cuda:0', help='Device for inference')
+@click.option('-o', '--output_dir', default=str(DEFAULT_OUTPUT_DIR), show_default=True,
+              help='Output directory for results')
+@click.option('-d', '--device', default=DEFAULT_DEVICE, show_default=True,
+              help='Device for inference')
 @click.option(
     '--fk-device', default=None,
     help='Optional FK-only device override; policy inference remains on --device.',
@@ -253,7 +267,8 @@ def _apply_runtime_overrides(cfg, runner_cfg, device=None, headless=None, fk_dev
 )
 @click.option('--precision', type=click.Choice(['fp32', 'fp16']), default=None,
               help='Inference precision. Default: training.precision from config, else fp32.')
-@click.option('--web-ui', is_flag=True, help='Serve the responsive local MuJoCo evaluation interface.')
+@click.option('--web-ui/--no-web-ui', default=True, show_default=True,
+              help='Serve the responsive local MuJoCo evaluation interface.')
 @click.option('--web-host', default='127.0.0.1', show_default=True, help='Web UI bind host.')
 @click.option('--web-port', default=8765, type=click.IntRange(1024, 65535), show_default=True, help='Web UI port.')
 @click.option('--web-no-browser', is_flag=True, help='Do not open the web UI automatically.')
@@ -286,6 +301,11 @@ def main(checkpoint, config, output_dir, device, fk_device, checkpoint_replica, 
     - Easy configuration of evaluation settings via config file
     """
     
+    # Release-relative defaults remove environment setup from the public CLI.
+    # Explicit environment values still win for development and custom layouts.
+    os.environ.setdefault('PREDACTOR_ROOT', str(EVALUATOR_ROOT))
+    os.environ.setdefault('PREDACTOR_TEXT_CHECKPOINT', str(DEFAULT_TEXT_CHECKPOINT))
+
     # Create output directory
     pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
 

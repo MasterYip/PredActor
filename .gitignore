@@ -5,3 +5,4 @@ Artifacts/
 eval_output/
 __pycache__/
 *.py[cod]
+*.egg-info/
