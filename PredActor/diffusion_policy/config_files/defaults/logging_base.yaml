@@ -1,0 +1,6 @@
+logging:
+  group: null
+  id: null
+  mode: online
+  project: diffuse_cloc
+  resume: true

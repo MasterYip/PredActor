@@ -1,0 +1,7 @@
+dataloader:
+  batch_size: 256
+  num_workers: 8               # 0=main process only (safest), >0 risks segfault with load_to_memory
+  persistent_workers: true     # false = respawn each epoch (safer, avoids memory leaks)
+  pin_memory: true
+  shuffle: true
+  prefetch_factor: 2            # prefetch batches per worker (only when num_workers > 0)

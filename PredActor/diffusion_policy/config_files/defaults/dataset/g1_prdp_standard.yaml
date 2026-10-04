@@ -1,0 +1,75 @@
+# G1 PRDP-Standard: body-kinematics observation + RL-obs task condition (no text).
+#
+# OBSERVATION-ONLY profile.  The task condition is the 96-d RL-obs set only;
+# there is NO text_cond term here.  g1prdp_diffuse (observation-only PRDP)
+# uses this profile and declares cond_dim=96.
+#
+# Observation — same as g1_standard (192-dim body-kin FK, random_symm → 384):
+#   body_pos_local       90  — 30 bodies × 3 in character frame
+#   body_lin_vel_local   90  — 30 bodies × 3 in character frame
+#   root_pos_local        3
+#   root_rot_local        3
+#   root_lin_vel_local    3
+#   root_ang_vel_local    3
+#
+# Task condition — RL-obs terms only (96-dim, no text_cond):
+#   joint_pos            29
+#   joint_vel            29
+#   projected_gravity     3
+#   base_lin_vel          3
+#   base_ang_vel          3
+#   last_actions         29
+#
+# Key comparison: g1_diffuse (cond_dim=0, same obs) vs g1_prdp_diffuse (cond_dim=96).
+# Isolates the effect of RL-obs conditioning on root_pos_guidance quality.
+#
+# Backbone dims:
+#   x_input_dim / x_output_dim = 384  (192 × 2, random_symm)
+#   cond_dim                   =  96  (RL obs, n_task_steps=4)
+#
+# The text-conditioned variant lives in g1_prdp_standard_cond.yaml (used by
+# g1prdp_cond_diffuse, cond_dim=608).
+
+data_profile:
+  name: G1PRDPStandard
+
+  observation:
+    terms:
+      - body_pos_local
+      - body_lin_vel_local
+      - root_pos_local
+      - root_rot_local
+      - root_lin_vel_local
+      - root_ang_vel_local
+    state_normalize: true
+    state_emph:
+      type: random_symm          # doubles obs_dim: 192 → 384
+      weights:
+        body_pos_local: 1.0
+        body_lin_vel_local: 1.0
+        root_pos_local: 4.0
+        root_rot_local: 4.0
+        root_lin_vel_local: 1.0
+        root_ang_vel_local: 4.0
+
+  task_condition:
+    terms:
+      - joint_pos                # 29-d \
+      - joint_vel                # 29-d  |
+      - projected_gravity        #  3-d   | = 96-d RL obs
+      - base_lin_vel             #  3-d   |
+      - base_ang_vel             #  3-d   |
+      - last_actions             # 29-d /
+    state_normalize: true
+    state_emph:
+      type: same
+      weights:
+        joint_pos: 1.2
+        joint_vel: 0.9
+        projected_gravity: 3.0
+        base_lin_vel: 2.0
+        base_ang_vel: 2.5
+        last_actions: 0.85
+    # No dropout_config_train here: the observation-only slice has no text_cond
+    # to drop.  Text_cond dropout lives in g1_prdp_standard_cond.yaml.
+  action_term: act

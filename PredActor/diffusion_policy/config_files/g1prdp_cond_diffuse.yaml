@@ -1,0 +1,164 @@
+_target_: diffusion_policy.trainer.offline_trainer.OfflineTrainer
+
+defaults:
+  - defaults/data_collection
+  - defaults/dataloader
+  - defaults/val_dataloader
+  - defaults/ema
+  - defaults/logging_base
+  - defaults/optimizer
+  - defaults/policy/cond_codiffuse
+  - defaults/dataset/base
+  - defaults/training
+  - defaults/checkpoint
+  - defaults/env_runner
+  - defaults/env/mujoco
+  - _self_
+
+exp_name: null
+output_dir: "./outputs/"
+dataset_dir: "unused-evaluation-only"
+
+logging:
+  group: null
+  id: null
+  mode: online
+  name: 'g1prdp_cond_diffuse'
+  project: diffuse_cloc
+  resume: true
+  tags:
+  - g1prdp
+  - prdp
+  - codiffusion
+  - default
+
+policy:
+  # Per-term condition dropout is configured in the dataset profile (text_cond only).
+  condition_dropout_config:
+    enable: false
+  actor:
+    _target_: diffusion_policy.modules.diffuse_cprdp.DiffuseCPRDP
+    enable_root_pos_guide: false
+    whole_body_guidance_config:
+      enabled: true
+      profile: g1_standard
+      guidance_mode: classifier   # "classifier" (paper-correct) or "pd" (legacy)
+      mode: simple               # "simple" (fast) or "integration" (accurate but slower)
+      enable_zeta_comp: false     # false: legacy single-level zeta for DDIM jumps
+      enable_damping_comp: true  # false: legacy projected-gradient damping
+      # World-frame destination follow is disabled by default and can be
+      # enabled from the cond-eval web UI without changing checkpoint shapes.
+      destination_follow_config:
+        enabled: false
+        kp_x: 2.0
+        kp_y: 0.8
+        kp_w: 6.0
+        vx_range: [0.0, 8.0]
+        vy_range: [-1.0, 1.0]
+        wz_range: [-10.0, 10.0]
+        heading_dead_zone: 0.01
+        arrival_radius: 0.30
+        rearm_radius: 0.60
+      gui:
+        enabled: true
+      # ── v2: each DOF is an independent guidance with its own activation set ──
+      guidances:
+        vx_guide:
+          enabled: true
+          kp: 1.0
+          range: [-10.0, 10.0]
+          body_groups:
+            guided: [pelvis_torso]
+        vy_guide:
+          enabled: true
+          kp: 1.0
+          range: [-10.0, 10.0]
+          body_groups:
+            guided: [torso]
+        wz_guide:
+          enabled: true
+          kp: 1.0
+          range: [-5.0, 5.0]
+          body_groups:
+            guided: [torso]
+        hz_guide:                     # z-height (pelvis height) guidance
+          enabled: true
+          kp: 1.0
+          z_init: 0.75
+          z_range: [0.3, 1.1]
+          body_groups:
+            guided: [torso]
+        left_wrist_guide:             # left end-effector guidance
+          enabled: false
+          kp: 1.0
+          dx_range: [-0.5, 0.5]
+          dy_range: [-0.5, 0.5]
+          dz_range: [-0.3, 0.3]
+          body_groups:
+            guided: [wrist]
+        right_wrist_guide:            # right end-effector guidance
+          enabled: false
+          kp: 1.0
+          dx_range: [-0.5, 0.5]
+          dy_range: [-0.5, 0.5]
+          dz_range: [-0.3, 0.3]
+          body_groups:
+            guided: [wrist]
+        # point_reach:                  # world-frame point-reach → auto vx/vy/vz
+        #   enabled: true
+        #   kp: 1.0
+        #   kp_pos: 2.0
+        #   vx_range: [-10.0, 10.0]
+        #   vy_range: [-10.0, 10.0]
+        #   vz_range: [-5.0, 5.0]
+        #   target_init: [0.0, 0.0, 0.8]
+        #   target_x_range: [-3.0, 3.0]
+        #   target_y_range: [-3.0, 3.0]
+        #   target_z_range: [0.0, 2.0]
+        #   body_groups:
+        #     guided: [torso]
+    backbone:
+      # x-stream: root_pos_local (3) + body_pos_local (90) + body_lin_vel_local (90) = 183-d base
+      # random_symm emphasis doubles → 366-d projected
+      x_input_dim: 384
+      x_output_dim: 384
+      # cond_dim = per-step feature size: RL_obs(96) + text_cond(512) = 608
+      cond_dim: 608
+      # n_cond_steps = n_past_steps (one cond token per history step)
+      n_cond_steps: 4
+      # cross_attn_window: 4  # uncomment to enable windowed cross-attention
+      cross_attn_mode: "full"  # "full" | "state" | "action" | "no_attn"
+      #   full:    both x and y cross-attend to condition (default)
+      #   state:   only x (state) tokens attend — y is decoded from self-attn with x
+      #   action:  only y (action) tokens attend — x is decoded from self-attn with y
+      #   no_attn: no cross-attention (condition only used during training, not inference)
+
+    clean_past_state: false      # [training-time] zero-out noise on already-observed state frames (training only)
+    no_state_override: true    # [inference-time] denoise x-stream from cond, skip nobs inpainting → FK-free deploy (no effect on training)
+    data_profile: g1_prdp_standard_cond   # text-conditioned PRDP profile (96 RL obs + 512 text)
+    # DDIM acceleration: run fewer denoising steps at inference
+    # ddim_steps: null  → standard Rolling Diffusion DDPM (default)
+    # ddim_steps: 5     → DDIM with 5 steps (4× faster, no rolling buffer)
+    ddim_steps: 5
+    ddim_eta: 0.0       # 0.0 = fully deterministic DDIM; 1.0 ≈ DDPM stochasticity
+    use_ns_ddim: true  # [DEBUG] use NoiseScheduler.ddim_step for cross-validation
+    randomize_noise_schedule: true  # Enable Rolling Diffusion (randomize per-step noise level)
+
+dataset:
+  _target_: diffusion_policy.dataset.g1_dataset.G1Dataset
+  data_profile: g1_prdp_standard_cond   # text-conditioned PRDP profile
+  zarr_path: motion_dyed_text_t0.01.zarr
+  n_task_steps: 4
+  data_sample_rate: 0.01
+
+env_runner:
+  task_cond_providers:
+    clip_teleop:
+      enabled: true
+    clip_interp:
+      enabled: false
+  enable_debugger: false
+  debugger_config:
+    show_velocities: false
+    show_root_states: true
+    show_rlobs: true

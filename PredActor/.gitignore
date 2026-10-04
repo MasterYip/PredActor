@@ -1,0 +1,16 @@
+# Learned weights and generated evidence remain external to this repository.
+*.ckpt
+*.engine
+*.onnx
+*.pt
+*.pth
+*.pth.tar
+*.safetensors
+*.tflite
+*.weights
+outputs/
+eval_output/
+__pycache__/
+*.py[cod]
+.venv/
+Artifacts/

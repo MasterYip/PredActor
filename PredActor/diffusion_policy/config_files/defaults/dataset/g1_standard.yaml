@@ -1,0 +1,70 @@
+# G1 standard 192-dim body-kinematics observation profile.
+#
+# Observation layout (192 dims):
+#   body_pos_local      90  — 30 bodies × 3 in character frame
+#   body_lin_vel_local  90  — 30 bodies × 3 in character frame
+#   root_pos_local       3
+#   root_rot_local       3
+#   root_lin_vel_local   3
+#   root_ang_vel_local   3
+#
+# Use with G1Dataset(profile="g1_standard.yaml").
+
+data_profile:
+  name: G1
+
+  observation:
+    terms:
+      - body_pos_local
+      - body_lin_vel_local
+      - root_pos_local
+      - root_rot_local
+      - root_lin_vel_local
+      - root_ang_vel_local
+    state_normalize: true
+    state_emph: # NOTE: state_emph only valid for co-diffuse
+      type: random_symm      # doubles obs_dim: (192) → (192, 384)
+      weights:
+        body_pos_local: 1.0
+        body_lin_vel_local: 1.0
+        root_pos_local: 4.0
+        root_rot_local: 4.0
+        root_lin_vel_local: 1.0
+        root_ang_vel_local: 4.0
+
+  task_condition:
+    # NOTE: Leave empty for legacy TextCLIP conditioning method only.
+    terms: [text_cond]                # add [text_cond, ...] here for CLIP-guided variants
+    state_normalize: false
+    # -----------------------------------------------------------------------
+    # Per-term condition dropout (CLIP only — obs terms need no dropout here).
+    #
+    # Applied to the text_cond slice by PerTermConditionDropout (cond_dropout.py).
+    # Runs BEFORE the task mask generator.
+    #
+    # Context (2026-08-01 latent comparison, universal across all datasets):
+    #   text_cond dims       = 512, per-dim std ≈ 0.032, ‖latent‖ = 1.0
+    #   ‖noise‖ ≈ √(512×σ²)  for "noise" (per-dim σ)
+    #   ‖noise‖ ≈ noise_std  for "perturb" (target L2 norm)
+    # -----------------------------------------------------------------------
+    dropout_config_train:
+      text_cond:
+        enabled: true             # master on/off
+
+        initial_prob: 0.0         # P(dropout) at step 0          — used by null/noise/dimensions
+        final_prob: 0.3           # P(dropout) after warmup       — used by null/noise/dimensions
+        warmup_steps: 150000      # linear ramp steps             — used by null/noise/dimensions
+
+        # Dropout strategies (see g1_prdp_standard.yaml for full docs):
+        #   "null"       → 30% samples: cond=0           (CFG training)
+        #   "noise"      → 30% samples: cond+N(0,σ²)     (σ per-dim)
+        #   "dimensions" → 30% samples: per-dim Bernoulli (fine-grained mask)
+        #   "perturb"    → 100% samples: cond+N(0,(σ/√D)²)  (σ = target ‖noise‖)
+        #
+        # noise_std interpretation:
+        #   "noise"   : per-dim σ.  0.2→‖noise‖≈4.5 (DESTROYS signal, 6.3× per-dim std)
+        #               0.05→‖noise‖≈1.1, 0.08→‖noise‖≈1.8
+        #   "perturb" : target L2 norm.  1.3 matches ‖text−notext‖≈1.29
+        dropout_type: "perturb"
+        noise_std: 1.4
+  action_term: act

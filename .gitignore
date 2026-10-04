@@ -1,0 +1,8 @@
+.venv/
+.hf_cache/
+.hf_upload_staging/
+Artifacts/
+eval_output/
+__pycache__/
+*.py[cod]
+*.egg-info/

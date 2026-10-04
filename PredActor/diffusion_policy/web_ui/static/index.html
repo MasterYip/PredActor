@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PredActor Conditional Evaluation</title>
+  <link rel="stylesheet" href="/assets/app.css?v=23">
+  <link rel="stylesheet" href="/assets/generated_wave_texture.css?v=5">
+</head>
+<body>
+  <header class="rail">
+    <div class="identity" aria-label="PredActor - Predictive Action Diffusion">
+      <img class="brand-lockup" src="/assets/brand/predactor-on-dark.svg" data-dark-src="/assets/brand/predactor-on-dark.svg" data-light-src="/assets/brand/predactor-on-white.svg" alt="PredActor - Predictive Action Diffusion"><b>Predictive Action Diffusion Controller</b>
+    </div>
+    <div class="run-meta"><span id="connection" class="status">CONNECTING</span><span>STEP <b id="step">0</b></span><span><b id="fps">0</b> FPS</span></div>
+    <button id="appearance" class="icon-button" aria-label="Open appearance settings" title="Appearance settings">&#9881;</button>
+    <button id="pause" class="icon-button" aria-label="Pause evaluation" title="Pause evaluation">&#10074;&#10074;</button>
+  </header>
+
+  <main class="workspace">
+    <section class="viewport" aria-label="Live MuJoCo simulation">
+      <canvas id="sim-canvas" aria-label="Live MuJoCo WebGL simulation"></canvas>
+      <div id="viewport-state" class="viewport-state"><span class="spinner"></span> WAITING FOR SIMULATOR</div>
+      <div class="viewport-label"><span>MUJOCO / G1</span><span id="perturb-status">PERTURB OFF</span><button id="sim-help" class="help-button" type="button" title="Simulation controls" aria-label="Open simulation interaction help">?</button><button id="sim-reset" class="viewport-tool" type="button" title="Reset MuJoCo robot" aria-label="Reset MuJoCo robot">&#8634;</button><label class="auto-reset-control" title="Reset automatically when the robot falls"><input id="sim-auto-reset" type="checkbox" checked><span aria-hidden="true"></span><em>AUTO RESET</em></label><span id="frame-age">LIVE</span></div>
+    </section>
+
+    <aside class="controls">
+      <section class="section wbg" aria-labelledby="wbg-title">
+        <div class="section-head"><h1 id="wbg-title">Whole-body guidance</h1><label class="switch"><input id="wbg-enabled" type="checkbox" checked><span></span><em>Enabled</em></label></div>
+        <div class="source-line"><span class="source-dot"></span><span>SOURCE OWNER</span><div class="source-select"><button class="active" data-source="web">WEB</button><button data-source="joystick">JOY</button></div></div>
+        <div id="wbg-sliders" class="sliders">
+          <label><span>Forward</span><output id="vx-out">0.00</output><input aria-label="Forward velocity" data-key="vx" type="range" min="-5" max="5" step="0.05" value="0"></label>
+          <label><span>Lateral</span><output id="vy-out">0.00</output><input aria-label="Lateral velocity" data-key="vy" type="range" min="-4" max="4" step="0.05" value="0"></label>
+          <label><span>Yaw</span><output id="wz-out">0.00</output><input aria-label="Yaw velocity" data-key="wz" type="range" min="-2" max="2" step="0.02" value="0"></label>
+          <label><span>Height</span><output id="hz-out">0.75</output><input aria-label="Pelvis height" data-key="hz" type="range" min="0.3" max="1.1" step="0.01" value="0.75"></label>
+          <label><span>Gain Kp</span><output id="kp-out">1.00</output><input aria-label="Guidance gain" data-key="kp" type="range" min="0" max="4" step="0.02" value="1"></label>
+        </div>
+        <section class="destination-follow" aria-labelledby="destination-title">
+          <div class="subsection-head"><h2 id="destination-title">Destination follow</h2><label class="switch"><input id="destination-enabled" type="checkbox"><span></span><em id="destination-enabled-label">Off</em></label></div>
+          <form id="destination-form" class="destination-form">
+            <label><span>X</span><input id="destination-x" type="number" step="0.05" value="0.0" aria-label="Destination world X"></label>
+            <label><span>Y</span><input id="destination-y" type="number" step="0.05" value="0.0" aria-label="Destination world Y"></label>
+            <label><span>Z</span><input id="destination-z" type="number" step="0.05" value="0.8" aria-label="Destination world Z"></label>
+            <button type="submit" title="Set destination and enable follow">SET</button>
+          </form>
+          <div class="destination-actions"><button id="destination-cancel" type="button" title="Cancel destination follow">CANCEL</button><output id="destination-status">Unavailable</output></div>
+          <output id="destination-command" class="destination-command" aria-live="polite">Command unavailable</output>
+          <details class="destination-tuning">
+            <summary>Controller tuning</summary>
+            <form id="destination-config-form" class="destination-config-form">
+              <label><span>Forward gain</span><input id="destination-kp-x" data-destination-config="kp_x" type="number" step="0.01" value="2.00"></label>
+              <label><span>Lateral gain</span><input id="destination-kp-y" data-destination-config="kp_y" type="number" step="0.01" value="0.80"></label>
+              <label><span>Heading gain</span><input id="destination-kp-w" data-destination-config="kp_w" type="number" step="0.01" value="6.00"></label>
+              <label><span>Forward min</span><input id="destination-vx-min" data-destination-range="vx_range" data-range-index="0" type="number" step="0.01" value="0.00"></label>
+              <label><span>Forward max</span><input id="destination-vx-max" data-destination-range="vx_range" data-range-index="1" type="number" step="0.01" value="8.00"></label>
+              <label><span>Lateral min</span><input id="destination-vy-min" data-destination-range="vy_range" data-range-index="0" type="number" step="0.01" value="-1.00"></label>
+              <label><span>Lateral max</span><input id="destination-vy-max" data-destination-range="vy_range" data-range-index="1" type="number" step="0.01" value="1.00"></label>
+              <label><span>Yaw min</span><input id="destination-wz-min" data-destination-range="wz_range" data-range-index="0" type="number" step="0.01" value="-10.00"></label>
+              <label><span>Yaw max</span><input id="destination-wz-max" data-destination-range="wz_range" data-range-index="1" type="number" step="0.01" value="10.00"></label>
+              <label><span>Heading dead zone</span><input id="destination-heading-dead-zone" data-destination-config="heading_dead_zone" type="number" step="0.01" value="0.01"></label>
+              <label><span>Arrival radius</span><input id="destination-arrival-radius" data-destination-config="arrival_radius" type="number" step="0.01" value="0.30"></label>
+              <label><span>Rearm radius</span><input id="destination-rearm-radius" data-destination-config="rearm_radius" type="number" step="0.01" value="0.60"></label>
+              <button type="submit" title="Apply destination controller tuning">APPLY</button>
+            </form>
+          </details>
+        </section>
+        <section id="activation-manager" class="activation-manager" aria-labelledby="activation-title" hidden>
+          <div class="subsection-head">
+            <h2 id="activation-title">Activation manager</h2>
+            <div><select id="guidance-select" aria-label="Guidance type"></select><button id="activation-reset" class="reset-button" type="button" title="Reset body and term overrides" aria-label="Reset activation overrides">&#8634;</button></div>
+          </div>
+          <div id="guidance-summary" class="guidance-summary"></div>
+          <h3>Body groups</h3><div id="guidance-groups" class="activation-groups"></div>
+          <h3>Body activation</h3><div id="guidance-bodies" class="body-activation"></div>
+          <h3>Terms</h3><div id="guidance-terms" class="term-activation"></div>
+        </section>
+      </section>
+
+      <section class="section joy" aria-labelledby="joy-title">
+        <div class="section-head"><h2 id="joy-title">Controller</h2><span id="joy-status" class="muted">SEARCHING</span><button id="joy-help" class="help-button" type="button" title="Controller mapping" aria-label="Open controller mapping help">?</button></div>
+        <div class="joy-grid">
+          <div class="stick" data-stick="left"><i></i><em data-button="l3">L3</em><span>L</span></div>
+          <div class="triggers"><div data-axis="l2"><span>LT</span><i id="lt"></i></div><div data-axis="r2"><span>RT</span><i id="rt"></i></div></div>
+          <div class="shoulders"><i id="lb" data-button="l1">LB</i><i id="rb" data-button="r1">RB</i></div>
+          <div class="stick" data-stick="right"><i></i><em data-button="r3">R3</em><span>R</span></div>
+          <div class="dpad" aria-label="D-pad state">
+            <i data-direction="up" aria-label="D-pad up"></i><i data-direction="right" aria-label="D-pad right"></i>
+            <i data-direction="down" aria-label="D-pad down"></i><i data-direction="left" aria-label="D-pad left"></i><span aria-hidden="true"></span>
+          </div>
+          <div id="buttons" class="buttons"><i>A</i><i>B</i><i>X</i><i>Y</i></div>
+          <div id="mapped-buttons" class="mapped-buttons"></div>
+          <div id="mapped-axes" class="mapped-axes"></div>
+        </div>
+      </section>
+    </aside>
+
+    <section class="text-console" aria-labelledby="text-title">
+      <div class="section-head"><h2 id="text-title">CLIP command</h2><div class="motion-status"><span>Motion</span><b id="current-motion">--</b></div><div class="tabs" role="tablist"><button class="active" data-mode="textop" role="tab">TEXTOP</button><button data-mode="interp" role="tab">INTERP</button></div></div>
+      <div id="history" class="history" aria-live="polite"><p class="empty">Commands will appear here.</p></div>
+      <form id="text-form" class="composer">
+        <label class="sr-only" for="prompt">Motion command</label><input id="prompt" maxlength="240" autocomplete="off" placeholder="Describe the next motion" aria-label="Motion command">
+        <button type="submit" aria-label="Apply command" title="Apply command">&#8593;</button>
+      </form>
+      <form id="interp-form" class="interp-form" aria-label="Semantic proposition editor" hidden>
+        <div id="interp-terms" class="interp-terms" aria-live="polite"><p class="empty">Interpolation provider unavailable.</p></div>
+        <div class="interp-actions">
+          <button id="interp-add" class="interp-icon" type="button" aria-label="Add semantic proposition" title="Add semantic proposition">+</button>
+          <span id="interp-summary">NORMALIZED VECTOR SUM</span>
+          <button class="interp-apply" type="submit">APPLY</button>
+        </div>
+      </form>
+      <div id="command-error" class="command-error" role="alert"></div>
+    </section>
+  </main>
+  <dialog id="joy-help-dialog" aria-labelledby="joy-help-title">
+    <header><h2 id="joy-help-title">Controller mapping</h2><button id="joy-help-close" type="button" aria-label="Close controller mapping">&times;</button></header>
+    <div id="joy-help-content"></div>
+  </dialog>
+  <dialog id="appearance-dialog" aria-labelledby="appearance-title">
+    <header><h2 id="appearance-title">Appearance</h2><button id="appearance-close" type="button" aria-label="Close appearance settings">&times;</button></header>
+    <label class="theme-control"><span>Light scene</span><input id="theme-light" type="checkbox" role="switch" aria-label="Use light interface and simulation scene"><span class="theme-toggle" aria-hidden="true"></span><em id="theme-mode">Dark</em></label>
+    <label class="density-control"><span>Wave-dot density</span><output id="texture-density-out" for="texture-density">75%</output><input id="texture-density" type="range" min="40" max="100" step="1" value="75"></label>
+    <button id="texture-density-reset" class="reset-button" type="button">Reset density</button>
+  </dialog>
+  <dialog id="sim-help-dialog" aria-labelledby="sim-help-title">
+    <header><h2 id="sim-help-title">Simulation interaction</h2><button id="sim-help-close" type="button" aria-label="Close simulation interaction help">&times;</button></header>
+    <dl><dt>Double-click</dt><dd>Select a dynamic body</dd><dt>Ctrl + right drag</dt><dd>Apply force at the selected point</dd><dt>Ctrl + left drag</dt><dd>Apply torque to the selected body</dd><dt>Orange arrow</dt><dd>Transmitted drag direction and magnitude</dd></dl>
+  </dialog>
+  <template id="interp-term-template">
+    <div class="interp-term">
+      <span class="interp-index"></span>
+      <div class="interp-endpoint"><button class="interp-zero" data-zero="a" type="button" title="Toggle zero-vector start" aria-label="Toggle zero-vector start">Ø</button><input data-endpoint="a" maxlength="120" autocomplete="off" aria-label="Proposition start"></div>
+      <span class="interp-arrow" aria-hidden="true">&#8594;</span>
+      <div class="interp-endpoint"><button class="interp-zero" data-zero="b" type="button" title="Toggle zero-vector end" aria-label="Toggle zero-vector end">Ø</button><input data-endpoint="b" maxlength="120" autocomplete="off" aria-label="Proposition end"></div>
+      <label><span>WEIGHT</span><output>0.00</output><input data-weight type="range" min="0" max="1" step="0.01" value="0"></label>
+      <button class="interp-remove" type="button" aria-label="Remove semantic proposition" title="Remove semantic proposition">&times;</button>
+    </div>
+  </template>
+  <script src="/assets/app.js?v=22"></script>
+  <script type="module" src="/wasm/mujoco-app.js?v=17" onload="document.querySelector('#sim-canvas').dataset.module='loaded'" onerror="window.dispatchEvent(new CustomEvent('mujoco-error',{detail:'MuJoCo module failed to load'}))"></script>
+</body>
+</html>

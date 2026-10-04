@@ -1,0 +1,153 @@
+_target_: diffusion_policy.trainer.offline_trainer.OfflineTrainer
+
+defaults:
+  - defaults/data_collection
+  - defaults/dataloader
+  - defaults/val_dataloader
+  - defaults/ema
+  - defaults/logging_base
+  - defaults/optimizer
+  - defaults/policy/cond_codiffuse
+  - defaults/dataset/base
+  - defaults/training
+  - defaults/checkpoint
+  - defaults/env_runner
+  - defaults/env/mujoco
+  - _self_
+
+exp_name: null
+output_dir: "./outputs/"
+dataset_dir: "unused-evaluation-only"
+
+logging:
+  group: null
+  id: null
+  mode: online
+  name: 'g1_prdp_diffuse'
+  project: diffuse_cloc
+  resume: true
+  tags:
+  - g1_prdp_standard
+  - codiffusion
+  - rlobs_cond
+  - root_pos_guide
+
+policy:
+  condition_dropout_config:
+    enable: false
+  actor:
+    enable_root_pos_guide: false
+    whole_body_guidance_config:
+      enabled: true
+      profile: g1_standard
+      guidance_mode: classifier   # "classifier" (paper-correct) or "pd" (legacy)
+      mode: simple               # "simple" (fast) or "integration" (accurate but slower)
+      enable_zeta_comp: true     # false: legacy single-level zeta for DDIM jumps
+      enable_damping_comp: true  # false: legacy projected-gradient damping
+      gui:
+        enabled: true
+      # ── v2: each DOF is an independent guidance with its own activation set ──
+      guidances:
+        vx_guide:
+          enabled: true
+          kp: 1.0
+          range: [-10.0, 10.0]
+          body_groups:
+            guided: [pelvis_torso]
+        vy_guide:
+          enabled: true
+          kp: 1.0
+          range: [-10.0, 10.0]
+          body_groups:
+            guided: [torso]
+        wz_guide:
+          enabled: true
+          kp: 1.0
+          range: [-5.0, 5.0]
+          body_groups:
+            guided: [torso]
+        hz_guide:                     # z-height (pelvis height) guidance
+          enabled: true
+          kp: 1.0
+          z_init: 0.75
+          z_range: [0.3, 1.1]
+          body_groups:
+            guided: [torso]
+        left_wrist_guide:             # left end-effector guidance
+          enabled: false
+          kp: 1.0
+          dx_range: [-0.5, 0.5]
+          dy_range: [-0.5, 0.5]
+          dz_range: [-0.3, 0.3]
+          body_groups:
+            guided: [wrist]
+        right_wrist_guide:            # right end-effector guidance
+          enabled: false
+          kp: 1.0
+          dx_range: [-0.5, 0.5]
+          dy_range: [-0.5, 0.5]
+          dz_range: [-0.3, 0.3]
+          body_groups:
+            guided: [wrist]
+        # point_reach:                  # world-frame point-reach → auto vx/vy/vz
+        #   enabled: true
+        #   kp: 1.0
+        #   kp_pos: 2.0
+        #   vx_range: [-10.0, 10.0]
+        #   vy_range: [-10.0, 10.0]
+        #   vz_range: [-5.0, 5.0]
+        #   target_init: [0.0, 0.0, 0.8]
+        #   target_x_range: [-3.0, 3.0]
+        #   target_y_range: [-3.0, 3.0]
+        #   target_z_range: [0.0, 2.0]
+        #   body_groups:
+        #     guided: [torso]
+    backbone:
+      # Observation: g1_standard 192-dim body-kin FK, random_symm → 384
+      x_input_dim: 384
+      x_output_dim: 384
+      # Condition: RL-obs only (96-dim, no text), n_cond_steps=4.
+      # g1_prdp_standard (observation-only profile) has a 96-d task_condition
+      # (joint_pos/joint_vel/projected_gravity/base_lin_vel/base_ang_vel/
+      # last_actions) with NO text_cond.  cond_dim MUST match that produced
+      # dimension (Gate-0 capability audit, release preflight).
+      cond_dim: 96
+      n_cond_steps: 4
+      # cross_attn_window: 4  # uncomment to enable windowed cross-attention
+      cross_attn_mode: "full"  # "full" | "state" | "action" | "no_attn"
+      #   full:    both x and y cross-attend to condition (default)
+      #   state:   only x (state) tokens attend — y is decoded from self-attn with x
+      #   action:  only y (action) tokens attend — x is decoded from self-attn with y
+      #   no_attn: no cross-attention (condition only used during training, not inference)
+
+    clean_past_state: false      # [training-time] zero-out noise on already-observed state frames (training only)
+    no_state_override: true    # [inference-time] denoise x-stream from cond, skip nobs inpainting → FK-free deploy (no effect on training)
+    data_profile: g1_prdp_standard
+    # DDIM acceleration: run fewer denoising steps at inference
+    # ddim_steps: null  → standard Rolling Diffusion DDPM (default)
+    # ddim_steps: 5     → DDIM with 5 steps (4× faster, no rolling buffer)
+    ddim_steps: 2
+    ddim_eta: 0.0       # 0.0 = fully deterministic DDIM; 1.0 ≈ DDPM stochasticity
+    use_ns_ddim: true  # [DEBUG] use NoiseScheduler.ddim_step for cross-validation
+    randomize_noise_schedule: true  # Enable Rolling Diffusion (randomize per-step noise level)
+
+dataset:
+  _target_: diffusion_policy.dataset.g1_dataset.G1Dataset
+  data_profile: g1_prdp_standard
+  zarr_path: motion_dyed_text_t0.01.zarr
+  n_task_steps: 4
+  data_sample_rate: 0.013
+
+training:
+  num_epochs: 100
+
+env_runner:
+  task_cond_providers:
+    clip_teleop:
+      enabled: false
+    clip_interp:
+      enabled: false
+  enable_debugger: false
+  debugger_config:
+    show_velocities: false
+    show_root_states: true

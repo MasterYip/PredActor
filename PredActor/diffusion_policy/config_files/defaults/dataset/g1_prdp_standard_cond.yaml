@@ -1,0 +1,138 @@
+# G1 PRDP-Standard-Cond: body-kinematics observation + RL-obs + text condition.
+#
+# TEXT-CONDITIONED profile.  The task condition is the 96-d RL-obs set plus
+# the 512-d text_cond term → 608-d per-step condition.  g1prdp_cond_diffuse
+# (text-conditioned PRDP) uses this profile and declares cond_dim=608.
+#
+# Observation — same as g1_standard (192-dim body-kin FK, random_symm → 384):
+#   body_pos_local       90  — 30 bodies × 3 in character frame
+#   body_lin_vel_local   90  — 30 bodies × 3 in character frame
+#   root_pos_local        3
+#   root_rot_local        3
+#   root_lin_vel_local    3
+#   root_ang_vel_local    3
+#
+# Task condition — RL-obs (96) + text_cond (512):
+#   joint_pos            29
+#   joint_vel            29
+#   projected_gravity     3
+#   base_lin_vel          3
+#   base_ang_vel          3
+#   last_actions         29
+#   text_cond           512  — CLIP ViT-B/32 text embedding (dyed motion_latent)
+#
+# Backbone dims:
+#   x_input_dim / x_output_dim = 384  (192 × 2, random_symm)
+#   cond_dim                   = 608  (96 RL obs + 512 text, n_task_steps=4)
+#
+# The observation-only variant lives in g1_prdp_standard.yaml (used by
+# g1prdp_diffuse, cond_dim=96).
+
+data_profile:
+  name: G1PRDPStandardCond
+
+  observation:
+    terms:
+      - body_pos_local
+      - body_lin_vel_local
+      - root_pos_local
+      - root_rot_local
+      - root_lin_vel_local
+      - root_ang_vel_local
+    state_normalize: true
+    state_emph:
+      type: random_symm          # doubles obs_dim: 192 → 384
+      weights:
+        body_pos_local: 1.0
+        body_lin_vel_local: 1.0
+        root_pos_local: 4.0
+        root_rot_local: 4.0
+        root_lin_vel_local: 1.0
+        root_ang_vel_local: 4.0
+
+  task_condition:
+    terms:
+      - joint_pos                # 29-d \
+      - joint_vel                # 29-d  |
+      - projected_gravity        #  3-d   | = 96-d RL obs
+      - base_lin_vel             #  3-d   |
+      - base_ang_vel             #  3-d   |
+      - last_actions             # 29-d /
+      - text_cond                # 512-d — CLIP ViT-B/32 text embedding
+    state_normalize: true
+    state_emph:
+      type: same
+      weights:
+        joint_pos: 1.2
+        joint_vel: 0.9
+        projected_gravity: 3.0
+        base_lin_vel: 2.0
+        base_ang_vel: 2.5
+        last_actions: 0.85
+    # -----------------------------------------------------------------------
+    # Per-term condition dropout (CLIP only — obs terms need no dropout here).
+    #
+    # Applied to the text_cond slice (last 512 dims of task_condition) by
+    # PerTermConditionDropout in cond_dropout.py.  Runs BEFORE the task mask
+    # generator so dropout corruption is visible to the mask signal.
+    #
+    # Context (from 2026-08-01 latent comparison on g1_kimodo_nosquat):
+    #   text_cond dims        = 512
+    #   per-dim std           ≈ 0.032   (all datasets, universal)
+    #   ‖latent‖ (L2)         = 1.0     (L2-normalised by dyeing pipeline)
+    #   ‖mean(text)‖          ≈ 0.66    (distribution NOT zero-centred)
+    #   paired ‖text−notext‖  ≈ 1.29    (same motion, different dyeing → 91% of random)
+    #   diff eff. rank (80%)  = 22 dims (out of 512 — highly anisotropic)
+    #
+    # Per-dim noise_std → ‖noise‖ conversion:
+    #   ‖noise‖ ≈ √(D × σ²) = √(512 × σ²)  for "noise" mode (per-dim σ)
+    #   ‖noise‖ ≈ noise_std                  for "perturb" mode (target L2 norm)
+    # -----------------------------------------------------------------------
+    dropout_config_train:
+      text_cond:
+        # Whether dropout is active for this term.
+        enabled: true
+
+        # initial_prob / final_prob / warmup_steps define a linear warmup
+        # schedule for the Bernoulli gate probability (NOT used by "perturb").
+        #   P(dropout) = initial_prob  at step 0
+        #   P(dropout) = final_prob    at step ≥ warmup_steps
+        #   Between:    linear interpolation
+        initial_prob: 0.0            # start with no dropout, ramp up
+        final_prob: 0.3              # at convergence, 30% of samples affected
+        warmup_steps: 150000         # ~3–4 epochs for a typical 50-epoch run
+
+        # ── Dropout type ───────────────────────────────────────────────
+        #
+        # "null"        30% of samples: cond set to zero.
+        #               Best for CFG (classifier-free guidance) training.
+        #
+        # "noise"       30% of samples: cond += N(0, noise_std²).
+        #               noise_std is PER-DIM σ → ‖noise‖ ≈ √(512×σ²).
+        #               σ=0.2 → ‖noise‖≈4.5 (3.5× ‖text−notext‖!) → destroys signal.
+        #               Use σ=0.05→‖noise‖≈1.1 or σ=0.08→‖noise‖≈1.8 for text-aligned.
+        #
+        # "dimensions"  30% of samples: per-dim Bernoulli zero-out.
+        #               Fine-grained masking, same prob schedule.
+        #
+        # "perturb"     100% of samples: cond += N(0, σ²) with σ = noise_std/√D.
+        #               noise_std is TARGET L2 NORM of perturbation vector.
+        #               ‖noise‖ ≈ noise_std (e.g. 1.3 matches ‖text−notext‖).
+        #               No Bernoulli gate — all samples get gentle noise.
+        #               Best for no-text datasets or when you want consistent
+        #               regularisation without "clean vs destroyed" alternation.
+        #
+        # Recommended:
+        #   text-aligned:  "noise"  noise_std=0.05–0.08  (moderate CFG)
+        #                  "perturb" noise_std=0.5–1.0    (gentle regularisation)
+        #   no-text:       "perturb" noise_std=1.0–1.3    (match ‖text−notext‖≈1.29)
+        #                  "null"                         (CFG, safest)
+        dropout_type: "perturb"
+
+        # Standard deviation (interpretation depends on dropout_type):
+        #   "noise"     : per-dimension σ (0.2 → 6.3× per-dim std → ‖noise‖≈4.5)
+        #   "perturb"   : target L2 norm of perturbation (1.3 → ‖noise‖≈1.3)
+        #   "null"      : ignored
+        #   "dimensions": ignored
+        noise_std: 0.5
+  action_term: act

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 661.9 151.69">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #333;
+      }
+
+      .cls-1, .cls-2 {
+        font-family: Arial-BoldMT, Arial;
+        font-size: 100px;
+        font-weight: 700;
+        letter-spacing: -.03em;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        isolation: isolate;
+      }
+
+      .cls-4 {
+        fill: #3e4649;
+      }
+
+      .cls-2, .cls-5 {
+        fill: #e7a12b;
+      }
+
+      .cls-6 {
+        stroke: #e7a12b;
+      }
+
+      .cls-6, .cls-7 {
+        stroke-width: 6.73px;
+      }
+
+      .cls-6, .cls-7, .cls-8 {
+        fill: none;
+      }
+
+      .cls-9 {
+        letter-spacing: .2em;
+      }
+
+      .cls-10 {
+        fill: #5a6466;
+      }
+
+      .cls-11 {
+        fill: #8d9599;
+      }
+
+      .cls-7 {
+        stroke: #333;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cls-12 {
+        letter-spacing: .14em;
+      }
+
+      .cls-8 {
+        stroke: #a7adaf;
+        stroke-width: 8.98px;
+      }
+
+      .cls-3 {
+        fill: #191919;
+        font-family: ArialMT, Arial;
+        font-size: 21.17px;
+      }
+    </style>
+  </defs>
+  <g id="_图层_1-2" data-name="图层 1">
+    <rect id="state-1" class="cls-4" x="14.91" y="71.83" width="34.63" height="34.63" rx="3" ry="3"/>
+    <rect id="state-2" class="cls-10" x="61.09" y="52.59" width="34.63" height="53.88" rx="3" ry="3"/>
+    <rect id="state-3" class="cls-11" x="107.27" y="29.5" width="34.63" height="76.97" rx="3" ry="3"/>
+    <rect id="state-4" class="cls-8" x="153.45" y="4.49" width="34.63" height="98.13" rx="3" ry="3"/>
+    <line id="horizon-1" class="cls-7" x1="3.37" y1="116.09" x2="658.54" y2="116.09"/>
+    <path id="action-1" class="cls-5" d="M20.68,126.67h23.09c3.19,0,5.77,2.58,5.77,5.77h0c0,3.19-2.58,5.77-5.77,5.77h-23.09c-3.19,0-5.77-2.58-5.77-5.77h0c0-3.19,2.58-5.77,5.77-5.77Z"/>
+    <path id="action-2" class="cls-5" d="M66.86,126.67h23.09c3.19,0,5.77,2.58,5.77,5.77h0c0,3.19-2.58,5.77-5.77,5.77h-23.09c-3.19,0-5.77-2.58-5.77-5.77h0c0-3.19,2.58-5.77,5.77-5.77Z"/>
+    <rect id="action-3" class="cls-5" x="107.27" y="126.67" width="34.63" height="25.01" rx="3" ry="3"/>
+    <path id="action-4" class="cls-6" d="M159.22,129.56h23.09c3.19,0,5.77,2.58,5.77,5.77h0c0,3.19-2.58,5.77-5.77,5.77h-23.09c-3.19,0-5.77-2.58-5.77-5.77h0c0-3.19,2.58-5.77,5.77-5.77Z"/>
+    <text class="cls-1" transform="translate(210.02 106.47)"><tspan x="0" y="0">Pred</tspan></text>
+    <text class="cls-2" transform="translate(397.72 106.47)"><tspan x="0" y="0">Actor</tspan></text>
+    <text id="descriptor-native" class="cls-3" transform="translate(212.02 142.06)"><tspan class="cls-9" x="0" y="0">PREDICTIVE</tspan><tspan class="cls-12" x="169.34" y="0"> </tspan><tspan class="cls-9" x="178.29" y="0">ACTION DIFFUSION</tspan></text>
+  </g>
+</svg>

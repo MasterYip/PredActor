@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://masteryip.github.io/predactor.github.io/"><img alt="Project website" src="https://img.shields.io/badge/Project_Website-E7A12B?style=for-the-badge&logo=googlechrome&logoColor=171817"></a>
   <a href="#demos"><img alt="Demo videos" src="https://img.shields.io/badge/Demo_Videos-7895A6?style=for-the-badge&logo=youtube&logoColor=white"></a>
-  <img alt="Code release coming soon" src="https://img.shields.io/badge/Code-Coming_Soon-5A5A57?style=for-the-badge">
+  <a href="#quick-evaluation"><img alt="Evaluation code available" src="https://img.shields.io/badge/Code-Evaluation_Release-5A5A57?style=for-the-badge"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-ECECEA?style=for-the-badge&labelColor=2F2F2D&color=ECECEA"></a>
 </p>
 
@@ -18,7 +18,30 @@
 </p>
 
 > [!IMPORTANT]
-> This repository currently provides the project overview and public demo links. Source code, trained checkpoints, and setup instructions are not available yet and will be added in a future release.
+> This release supports browser-based and bounded MuJoCo evaluation of the
+> published PDP051 checkpoint. Training, IsaacLab data collection, and robot
+> deployment are not part of the public evaluation interface.
+
+## Quick evaluation
+
+Install [uv](https://docs.astral.sh/uv/), then run these commands on Linux:
+
+```bash
+git clone https://github.com/MasterYip/PredActor.git
+cd PredActor
+uv sync --locked
+uv run --locked python scripts/hf_download.py --filter checkpoints
+uv run --locked predactor-eval
+```
+
+The last command opens `http://127.0.0.1:8765/`. It uses CUDA when available
+and otherwise falls back to CPU. The locked environment targets Python 3.10
+and includes the evaluator, MuJoCo, and the browser interface; Isaac Sim and
+the training repositories are not required.
+
+For a headless startup, use `uv run --locked predactor-eval --headless
+--web-no-browser`. Run `uv run --locked predactor-eval --help` for optional
+checkpoint, config, device, and Web UI overrides.
 
 ## Overview
 
@@ -88,13 +111,17 @@ Click any preview to open the corresponding MP4 video. Videos are hosted by the 
 | Resource | Description |
 | --- | --- |
 | [Project website](https://masteryip.github.io/predactor.github.io/) | Method overview, figures, authorship, and the complete demo gallery |
-| [Public repository](https://github.com/MasterYip/PredActor) | Official release channel for future code and model updates |
+| [Public repository](https://github.com/MasterYip/PredActor) | MuJoCo evaluation code and release updates |
+| [Evaluation artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts) | Hash-pinned PDP051 policy and G1 MotionCLIP checkpoints |
 | [Demo collection](https://masteryip.github.io/predactor.github.io/#evidence) | Simulation and hardware evidence in the browser |
 | Paper and citation | Coming soon |
 
-## Release status
+## Release scope
 
-The public release is being prepared. This README will be expanded with installation, model, data, and evaluation instructions when the implementation is ready. Please use the project website and this repository as the canonical public resources in the meantime.
+The public package contains the evaluation code and G1 assets required for the
+MuJoCo paths above. Learned weights remain in the separate Hugging Face
+artifact repository. Training, dataset generation, experiment orchestration,
+IsaacLab integration, and hardware control are intentionally excluded.
 
 ## License
 

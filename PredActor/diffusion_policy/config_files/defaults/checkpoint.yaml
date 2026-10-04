@@ -1,0 +1,3 @@
+checkpoint:
+  save_last_ckpt: true
+  upload_to_wandb: false          # Upload .ckpt files to wandb (large files, can fill storage quickly)

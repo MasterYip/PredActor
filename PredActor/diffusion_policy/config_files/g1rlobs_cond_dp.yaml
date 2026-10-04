@@ -1,0 +1,57 @@
+_target_: diffusion_policy.trainer.offline_trainer.OfflineTrainer
+
+defaults:
+  - defaults/data_collection
+  - defaults/dataloader
+  - defaults/val_dataloader
+  - defaults/ema
+  - defaults/logging_base
+  - defaults/optimizer
+  - defaults/policy/cond_diffuse
+  - defaults/dataset/base
+  - defaults/training
+  - defaults/checkpoint
+  - defaults/env_runner
+  - defaults/env/mujoco
+  - _self_
+
+exp_name: null
+output_dir: "./outputs/"
+dataset_dir: "unused-evaluation-only"
+
+logging:
+  group: null
+  id: null
+  mode: online
+  name: 'g1rlobs_dp_baseline'
+  project: diffuse_cloc
+  resume: true
+  tags:
+  - g1rlobs
+  - rl_obs
+  - diffusion_policy
+  - baseline
+
+policy:
+  actor:
+    backbone:
+      cond_dim: 608
+      n_layer: 2
+
+dataset:
+  _target_: diffusion_policy.dataset.g1_dataset.G1Dataset
+  data_profile: g1_rlobs
+  zarr_path: motion_dyed_text_t0.01.zarr
+
+env_runner:
+  enable_debugger: false
+  task_cond_providers:
+    clip_teleop:
+      enabled: false
+    clip_interp:
+      enabled: true
+  debugger_config:
+    show_velocities: false
+    show_root_states: false
+    show_rlobs: true
+
