@@ -34,6 +34,9 @@ uv run --locked python scripts/hf_download.py --filter checkpoints
 uv run --locked predactor-eval
 ```
 
+The download command retrieves the released checkpoints from
+[MasterYip/PredActor_Artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts).
+
 The last command opens `http://127.0.0.1:8765/`. It uses CUDA when available
 and otherwise falls back to CPU. The locked environment targets Python 3.10
 and includes the evaluator, MuJoCo, and the browser interface; Isaac Sim and

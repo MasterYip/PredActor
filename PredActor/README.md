@@ -17,8 +17,9 @@ uv run --locked predactor-eval
 ```
 
 The evaluator opens `http://127.0.0.1:8765/`, chooses CUDA when available, and
-falls back to CPU. Checkpoints live outside this package under the public
-repository's Git-ignored `Artifacts/` directory.
+falls back to CPU. Checkpoints are downloaded from
+[MasterYip/PredActor_Artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts)
+into the public repository's Git-ignored `Artifacts/` directory.
 
 This package supports local MuJoCo evaluation only. Training, IsaacLab data
 collection, Unitree SDK/DDS, and hardware actuation are outside this release.
