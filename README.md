@@ -74,53 +74,35 @@ For onboard execution, rolling denoising and computation-preserving runtime opti
 
 ## Demos
 
-The videos below are GitHub-hosted mirrors of the approved demos on the
-[project website](https://masteryip.github.io/predactor.github.io/#evidence),
-so they play directly in this README.
+Five paired views connect physical-robot evidence with the corresponding
+simulation capability. Select any frame to play its GitHub-hosted video, or
+visit the [project website](https://masteryip.github.io/predactor.github.io/#evidence)
+for the complete gallery.
 
-### Hardware
+<p align="center">
+  <a href="https://github.com/user-attachments/assets/f39231c8-96c7-4a8d-b239-d23ac460a5e4"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-behavioral-response.jpg" width="49%" alt="Physical G1 responding to external interference"></a>
+  <a href="https://github.com/user-attachments/assets/4752669d-dcc1-481b-8b8f-c40b8f5c2fd9"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-sim-disturbance-response.jpg" width="49%" alt="PredActor disturbance response in simulation"></a>
+</p>
 
-**Physical interaction** · Walk and stand commands under external interference.
+<p align="center">
+  <a href="https://github.com/user-attachments/assets/f6c25169-5c14-49c9-9bb2-50a9151432a8"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-text-walk-squat-walk.jpg" width="49%" alt="Physical G1 walk squat walk text-control sequence"></a>
+  <a href="https://github.com/user-attachments/assets/2355d8a0-aa95-4ab2-a45f-3bc75c4f46a9"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-sim-text-control.jpg" width="49%" alt="PredActor text control in simulation"></a>
+</p>
 
-https://github.com/user-attachments/assets/f39231c8-96c7-4a8d-b239-d23ac460a5e4
+<p align="center">
+  <a href="https://github.com/user-attachments/assets/6cf29b10-9150-48df-8241-320124bc0b95"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-text-walk-jog-squat.jpg" width="49%" alt="Physical G1 walk jog squat behavior transition"></a>
+  <a href="https://github.com/user-attachments/assets/9e5e946b-ea85-479d-9d83-70b9a7a5012c"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-sim-semantic-interpolation.jpg" width="49%" alt="PredActor semantic interpolation in simulation"></a>
+</p>
 
-**Text control** · Walk, squat down, and return to walking.
+<p align="center">
+  <a href="https://github.com/user-attachments/assets/04141756-978a-4b25-9a8f-237cfa1c7ca4"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-outdoor-pathway.jpg" width="49%" alt="Physical G1 following an outdoor pathway"></a>
+  <a href="https://github.com/user-attachments/assets/5d2b4f99-d7cf-42b3-ab70-202e107910fc"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-sim-target-tracking.jpg" width="49%" alt="PredActor classifier-guided target tracking in simulation"></a>
+</p>
 
-https://github.com/user-attachments/assets/f6c25169-5c14-49c9-9bb2-50a9151432a8
-
-**Behavior transitions** · Walk, accelerate to a jog, and transition into a squat.
-
-https://github.com/user-attachments/assets/6cf29b10-9150-48df-8241-320124bc0b95
-
-**Outdoor pathway** · Outdoor locomotion on the physical G1.
-
-https://github.com/user-attachments/assets/04141756-978a-4b25-9a8f-237cfa1c7ca4
-
-### Simulation
-
-**Joystick steering** · Directional steering with text-selected locomotion modes.
-
-https://github.com/user-attachments/assets/f5735ad1-efa1-4036-ab3f-709727daff5b
-
-**Text control** · Behavior selection and transitions from text commands.
-
-https://github.com/user-attachments/assets/2355d8a0-aa95-4ab2-a45f-3bc75c4f46a9
-
-**Semantic interpolation** · Continuous control between semantic motion endpoints.
-
-https://github.com/user-attachments/assets/9e5e946b-ea85-479d-9d83-70b9a7a5012c
-
-**Text and joystick** · Text-selected behavior with simultaneous directional control.
-
-https://github.com/user-attachments/assets/909137a3-0800-43ca-a00c-18b6c40ef026
-
-**Target tracking** · Classifier-guided destination following.
-
-https://github.com/user-attachments/assets/5d2b4f99-d7cf-42b3-ab70-202e107910fc
-
-**Disturbance response** · Recovery behavior under external perturbations.
-
-https://github.com/user-attachments/assets/4752669d-dcc1-481b-8b8f-c40b8f5c2fd9
+<p align="center">
+  <a href="https://github.com/user-attachments/assets/f5735ad1-efa1-4036-ab3f-709727daff5b"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-joystick-steering.jpg" width="49%" alt="PredActor joystick steering"></a>
+  <a href="https://github.com/user-attachments/assets/909137a3-0800-43ca-a00c-18b6c40ef026"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/predactor-sim-text-joystick.jpg" width="49%" alt="PredActor combined text and joystick control in simulation"></a>
+</p>
 
 ## Resources
 
