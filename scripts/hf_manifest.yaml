@@ -28,8 +28,8 @@ entries:
         size_bytes: 2551014
         sha256: 6d9f0b631c1e902141479d053147553e5a0b6af4244234b79d7e12e4191d2767
       predactor-readme-banner.svg:
-        size_bytes: 7321
-        sha256: 9e3ef96847f05bc7b1ad56d4a3de13c6e5e4adb91e3003cb78bf9c36e5715574
+        size_bytes: 7348
+        sha256: 925b6ac02811a1c49f5e7b31bc9a27b225fc8057b0f390d9481f92fc7e2295f1
       predactor-wordmark-on-dark.svg:
         size_bytes: 2905
         sha256: f8432dac695634c584c24adb505272fdc5f54ec1b069124896f94e6bcfbb6558
