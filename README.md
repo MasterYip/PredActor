@@ -74,42 +74,53 @@ For onboard execution, rolling denoising and computation-preserving runtime opti
 
 ## Demos
 
-Click any preview to open the corresponding MP4 video. Videos are hosted by the public project website and are not duplicated in this repository.
+The videos below are GitHub-hosted mirrors of the approved demos on the
+[project website](https://masteryip.github.io/predactor.github.io/#evidence),
+so they play directly in this README.
 
-<p align="center">
-  <a href="https://masteryip.github.io/predactor.github.io/static/videos/hoffman-mujoco-comprehensive.mp4">
-    <img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/hoffman-mujoco-comprehensive.jpg" width="100%" alt="Comprehensive PredActor simulation demo">
-  </a>
-</p>
+### Hardware
 
-<p align="center"><strong>Comprehensive simulation</strong><br><sub>Text commands, joystick steering, external interference, and semantic interpolation in one sequence.</sub></p>
+**Physical interaction** · Walk and stand commands under external interference.
 
-<table>
-  <tr>
-    <td width="50%" align="center">
-      <a href="https://masteryip.github.io/predactor.github.io/static/videos/hoffman-behavioral-reaction.mp4"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/hoffman-behavioral-reaction.jpg" width="100%" alt="PredActor hardware reaction demo"></a><br>
-      <strong>Hardware · Physical interaction</strong><br>
-      <sub>Walk and stand commands under external interference.</sub>
-    </td>
-    <td width="50%" align="center">
-      <a href="https://masteryip.github.io/predactor.github.io/static/videos/hoffman-text-walk-squat-walk.mp4"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/hoffman-text-walk-squat-walk.jpg" width="100%" alt="PredActor walk squat walk hardware demo"></a><br>
-      <strong>Hardware · Text control</strong><br>
-      <sub>Walk, squat down, and return to walking.</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" align="center">
-      <a href="https://masteryip.github.io/predactor.github.io/static/videos/hoffman-text-walk-jog-squat.mp4"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/hoffman-text-walk-jog-squat.jpg" width="100%" alt="PredActor walk jog squat hardware demo"></a><br>
-      <strong>Hardware · Behavior transitions</strong><br>
-      <sub>Walk, accelerate to a jog, and transition into a squat.</sub>
-    </td>
-    <td width="50%" align="center">
-      <a href="https://masteryip.github.io/predactor.github.io/static/videos/hoffman-joystick-steering.mp4"><img src="https://masteryip.github.io/predactor.github.io/static/videos/posters/hoffman-joystick-steering.jpg" width="100%" alt="PredActor joystick steering simulation demo"></a><br>
-      <strong>Simulation · Joystick steering</strong><br>
-      <sub>Directional steering with text-selected locomotion modes.</sub>
-    </td>
-  </tr>
-</table>
+https://github.com/user-attachments/assets/f39231c8-96c7-4a8d-b239-d23ac460a5e4
+
+**Text control** · Walk, squat down, and return to walking.
+
+https://github.com/user-attachments/assets/f6c25169-5c14-49c9-9bb2-50a9151432a8
+
+**Behavior transitions** · Walk, accelerate to a jog, and transition into a squat.
+
+https://github.com/user-attachments/assets/6cf29b10-9150-48df-8241-320124bc0b95
+
+**Outdoor pathway** · Outdoor locomotion on the physical G1.
+
+https://github.com/user-attachments/assets/04141756-978a-4b25-9a8f-237cfa1c7ca4
+
+### Simulation
+
+**Joystick steering** · Directional steering with text-selected locomotion modes.
+
+https://github.com/user-attachments/assets/f5735ad1-efa1-4036-ab3f-709727daff5b
+
+**Text control** · Behavior selection and transitions from text commands.
+
+https://github.com/user-attachments/assets/2355d8a0-aa95-4ab2-a45f-3bc75c4f46a9
+
+**Semantic interpolation** · Continuous control between semantic motion endpoints.
+
+https://github.com/user-attachments/assets/9e5e946b-ea85-479d-9d83-70b9a7a5012c
+
+**Text and joystick** · Text-selected behavior with simultaneous directional control.
+
+https://github.com/user-attachments/assets/909137a3-0800-43ca-a00c-18b6c40ef026
+
+**Target tracking** · Classifier-guided destination following.
+
+https://github.com/user-attachments/assets/5d2b4f99-d7cf-42b3-ab70-202e107910fc
+
+**Disturbance response** · Recovery behavior under external perturbations.
+
+https://github.com/user-attachments/assets/4752669d-dcc1-481b-8b8f-c40b8f5c2fd9
 
 ## Resources
 
