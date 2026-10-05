@@ -84,33 +84,25 @@ for the complete gallery.
   <tr>
     <td width="50%" valign="top">
       <strong>Text control</strong><br>
-      <sub>Walk, squat down, and return to walking.</sub>
-
-https://github.com/user-attachments/assets/f6c25169-5c14-49c9-9bb2-50a9151432a8
-
+      <sub>Walk, squat down, and return to walking.</sub><br>
+      <video src="https://github.com/user-attachments/assets/f6c25169-5c14-49c9-9bb2-50a9151432a8" controls width="100%"></video>
     </td>
     <td width="50%" valign="top">
       <strong>Behavior transitions</strong><br>
-      <sub>Walk, accelerate to a jog, and transition into a squat.</sub>
-
-https://github.com/user-attachments/assets/6cf29b10-9150-48df-8241-320124bc0b95
-
+      <sub>Walk, accelerate to a jog, and transition into a squat.</sub><br>
+      <video src="https://github.com/user-attachments/assets/6cf29b10-9150-48df-8241-320124bc0b95" controls width="100%"></video>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <strong>Physical interaction</strong><br>
-      <sub>Walk and stand commands under external interference.</sub>
-
-https://github.com/user-attachments/assets/f39231c8-96c7-4a8d-b239-d23ac460a5e4
-
+      <sub>Walk and stand commands under external interference.</sub><br>
+      <video src="https://github.com/user-attachments/assets/f39231c8-96c7-4a8d-b239-d23ac460a5e4" controls width="100%"></video>
     </td>
     <td width="50%" valign="top">
       <strong>Outdoor pathway</strong><br>
-      <sub>Outdoor locomotion on the physical G1.</sub>
-
-https://github.com/user-attachments/assets/04141756-978a-4b25-9a8f-237cfa1c7ca4
-
+      <sub>Outdoor locomotion on the physical G1.</sub><br>
+      <video src="https://github.com/user-attachments/assets/04141756-978a-4b25-9a8f-237cfa1c7ca4" controls width="100%"></video>
     </td>
   </tr>
 </table>
@@ -121,49 +113,37 @@ https://github.com/user-attachments/assets/04141756-978a-4b25-9a8f-237cfa1c7ca4
   <tr>
     <td width="50%" valign="top">
       <strong>Joystick steering</strong><br>
-      <sub>Directional steering with text-selected locomotion modes.</sub>
-
-https://github.com/user-attachments/assets/f5735ad1-efa1-4036-ab3f-709727daff5b
-
+      <sub>Directional steering with text-selected locomotion modes.</sub><br>
+      <video src="https://github.com/user-attachments/assets/f5735ad1-efa1-4036-ab3f-709727daff5b" controls width="100%"></video>
     </td>
     <td width="50%" valign="top">
       <strong>Text and joystick</strong><br>
-      <sub>Text-selected behavior with simultaneous directional control.</sub>
-
-https://github.com/user-attachments/assets/909137a3-0800-43ca-a00c-18b6c40ef026
-
+      <sub>Text-selected behavior with simultaneous directional control.</sub><br>
+      <video src="https://github.com/user-attachments/assets/909137a3-0800-43ca-a00c-18b6c40ef026" controls width="100%"></video>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <strong>Text control</strong><br>
-      <sub>Behavior selection and transitions from text commands.</sub>
-
-https://github.com/user-attachments/assets/2355d8a0-aa95-4ab2-a45f-3bc75c4f46a9
-
+      <sub>Behavior selection and transitions from text commands.</sub><br>
+      <video src="https://github.com/user-attachments/assets/2355d8a0-aa95-4ab2-a45f-3bc75c4f46a9" controls width="100%"></video>
     </td>
     <td width="50%" valign="top">
       <strong>Semantic interpolation</strong><br>
-      <sub>Continuous control between semantic motion endpoints.</sub>
-
-https://github.com/user-attachments/assets/9e5e946b-ea85-479d-9d83-70b9a7a5012c
-
+      <sub>Continuous control between semantic motion endpoints.</sub><br>
+      <video src="https://github.com/user-attachments/assets/9e5e946b-ea85-479d-9d83-70b9a7a5012c" controls width="100%"></video>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <strong>Target tracking</strong><br>
-      <sub>Classifier-guided destination following.</sub>
-
-https://github.com/user-attachments/assets/5d2b4f99-d7cf-42b3-ab70-202e107910fc
-
+      <sub>Classifier-guided destination following.</sub><br>
+      <video src="https://github.com/user-attachments/assets/5d2b4f99-d7cf-42b3-ab70-202e107910fc" controls width="100%"></video>
     </td>
     <td width="50%" valign="top">
       <strong>Disturbance response</strong><br>
-      <sub>Recovery behavior under external perturbations.</sub>
-
-https://github.com/user-attachments/assets/4752669d-dcc1-481b-8b8f-c40b8f5c2fd9
-
+      <sub>Recovery behavior under external perturbations.</sub><br>
+      <video src="https://github.com/user-attachments/assets/4752669d-dcc1-481b-8b8f-c40b8f5c2fd9" controls width="100%"></video>
     </td>
   </tr>
 </table>
