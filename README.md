@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://masteryip.github.io/predactor.github.io/"><img alt="Project website" src="https://img.shields.io/badge/Project_Website-E7A12B?style=for-the-badge&logo=googlechrome&logoColor=171817"></a>
+  <a href="https://arxiv.org/abs/2609.24840"><img alt="arXiv paper" src="https://img.shields.io/badge/arXiv-2609.24840-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white"></a>
   <a href="#demos"><img alt="Demo videos" src="https://img.shields.io/badge/Demo_Videos-7895A6?style=for-the-badge&logo=youtube&logoColor=white"></a>
   <a href="#quick-evaluation"><img alt="Evaluation code available" src="https://img.shields.io/badge/Code-Evaluation_Release-5A5A57?style=for-the-badge"></a>
   <a href="https://huggingface.co/MasterYip/PredActor_Artifacts"><img alt="Hugging Face artifacts" src="https://img.shields.io/badge/Hugging_Face-Artifacts-FFD21E?style=for-the-badge&logo=huggingface&logoColor=171817"></a>
@@ -118,7 +119,21 @@ Click any preview to open the corresponding MP4 video. Videos are hosted by the 
 | [Public repository](https://github.com/MasterYip/PredActor) | MuJoCo evaluation code and release updates |
 | [Evaluation artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts) | Hash-pinned PDP051 policy and G1 MotionCLIP checkpoints |
 | [Demo collection](https://masteryip.github.io/predactor.github.io/#evidence) | Simulation and hardware evidence in the browser |
-| Paper and citation | Coming soon |
+| [Paper](https://arxiv.org/abs/2609.24840) | arXiv preprint and citation |
+
+## Citation
+
+```bibtex
+@misc{ye2026predactorpredictiveactiondiffusion,
+  title={PredActor: Predictive Action Diffusion for Steerable Onboard Humanoid Control},
+  author={Lei Ye and Haibo Gao and Yitang Li and Peng Xu and Zetong Jing and Junhan Sun and Fanrong Dong and Ziqi Han and Xue Wang and Jianhua Sun and Cewu Lu and Hao Zhao and Liang Ding},
+  year={2026},
+  eprint={2609.24840},
+  archivePrefix={arXiv},
+  primaryClass={cs.RO},
+  url={https://arxiv.org/abs/2609.24840},
+}
+```
 
 ## Release scope
 
