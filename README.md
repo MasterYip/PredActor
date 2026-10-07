@@ -187,6 +187,15 @@ MuJoCo paths above. Learned weights remain in the separate Hugging Face
 artifact repository. Training, dataset generation, experiment orchestration,
 IsaacLab integration, and hardware control are intentionally excluded.
 
+## Release agenda
+
+| Release | Status | Scope |
+| --- | --- | --- |
+| Evaluation release | Available | Browser-based MuJoCo evaluation, G1 assets, and published evaluation checkpoints |
+| Data collection and labeling release | Planned | Motion collection, preprocessing, and dataset labeling tools |
+| BC training release | Planned | Behavior-cloning training code, configurations, and reproducibility assets |
+| DAgger release | Planned | Interactive data aggregation and policy refinement pipeline |
+
 ## License
 
 The contents of this repository are released under the [MIT License](LICENSE), unless noted otherwise.
