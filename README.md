@@ -158,6 +158,14 @@ for the complete gallery.
 | [Demo collection](https://masteryip.github.io/predactor.github.io/#evidence) | Simulation and hardware evidence in the browser |
 | [Paper](https://arxiv.org/abs/2609.24840) | arXiv preprint and citation |
 
+## Acknowledgements
+
+We thank the authors of the following open-source projects:
+
+- [diffusion_implementation](https://github.com/WhoKnowsssss/diffusion_implementation) by WhoKnowsssss, which provides the diffusion training framework.
+- [TextOp](https://github.com/TeleHuman/TextOp), which provides the RL tracker training framework and pretrained tracker checkpoint.
+- [MotionCLIP](https://github.com/GuyTevet/motion-clip), which provides the motion encoder foundation.
+
 ## Citation
 
 ```bibtex
