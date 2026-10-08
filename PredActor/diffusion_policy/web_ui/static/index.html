@@ -32,7 +32,6 @@
           <label><span>Forward</span><output id="vx-out">0.00</output><input aria-label="Forward velocity" data-key="vx" type="range" min="-5" max="5" step="0.05" value="0"></label>
           <label><span>Lateral</span><output id="vy-out">0.00</output><input aria-label="Lateral velocity" data-key="vy" type="range" min="-4" max="4" step="0.05" value="0"></label>
           <label><span>Yaw</span><output id="wz-out">0.00</output><input aria-label="Yaw velocity" data-key="wz" type="range" min="-2" max="2" step="0.02" value="0"></label>
-          <label><span>Height</span><output id="hz-out">0.75</output><input aria-label="Pelvis height" data-key="hz" type="range" min="0.3" max="1.1" step="0.01" value="0.75"></label>
           <label><span>Gain Kp</span><output id="kp-out">1.00</output><input aria-label="Guidance gain" data-key="kp" type="range" min="0" max="4" step="0.02" value="1"></label>
         </div>
         <section class="destination-follow" aria-labelledby="destination-title">
@@ -64,16 +63,19 @@
             </form>
           </details>
         </section>
-        <section id="activation-manager" class="activation-manager" aria-labelledby="activation-title" hidden>
+        <details id="activation-manager" class="activation-manager" aria-labelledby="activation-title" hidden>
+          <summary class="activation-summary"><span id="activation-title" role="heading" aria-level="2">Activation manager</span><span>Advanced guidance controls</span></summary>
+          <div class="activation-content">
           <div class="subsection-head">
-            <h2 id="activation-title">Activation manager</h2>
+            <span class="sr-only">Guidance controls</span>
             <div><select id="guidance-select" aria-label="Guidance type"></select><button id="activation-reset" class="reset-button" type="button" title="Reset body and term overrides" aria-label="Reset activation overrides">&#8634;</button></div>
           </div>
           <div id="guidance-summary" class="guidance-summary"></div>
           <h3>Body groups</h3><div id="guidance-groups" class="activation-groups"></div>
           <h3>Body activation</h3><div id="guidance-bodies" class="body-activation"></div>
           <h3>Terms</h3><div id="guidance-terms" class="term-activation"></div>
-        </section>
+          </div>
+        </details>
       </section>
 
       <section class="section joy" aria-labelledby="joy-title">
@@ -98,7 +100,7 @@
       <div class="section-head"><h2 id="text-title">CLIP command</h2><div class="motion-status"><span>Motion</span><b id="current-motion">--</b></div><div class="tabs" role="tablist"><button class="active" data-mode="textop" role="tab">TEXTOP</button><button data-mode="interp" role="tab">INTERP</button></div></div>
       <div id="history" class="history" aria-live="polite"><p class="empty">Commands will appear here.</p></div>
       <form id="text-form" class="composer">
-        <label class="sr-only" for="prompt">Motion command</label><input id="prompt" maxlength="240" autocomplete="off" placeholder="Describe the next motion" aria-label="Motion command">
+        <label class="sr-only" for="prompt">Motion command</label><input id="prompt" maxlength="240" autocomplete="off" placeholder="Describe the next motion (e.g. walk, jog, run, squat down, jump up, raise hand, kick.) Due to dataset limitation, complex motion may not work." aria-label="Motion command">
         <button type="submit" aria-label="Apply command" title="Apply command">&#8593;</button>
       </form>
       <form id="interp-form" class="interp-form" aria-label="Semantic proposition editor" hidden>
