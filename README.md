@@ -20,9 +20,9 @@
 </p>
 
 > [!IMPORTANT]
-> This release supports browser-based and bounded MuJoCo evaluation of the
-> published PDP051 checkpoint. Training, IsaacLab data collection, and robot
-> deployment are not part of the public evaluation interface.
+> The evaluation code is available now, with browser-based MuJoCo evaluation
+> of the published PDP051 checkpoint. Training, data collection, and robot
+> deployment releases are coming soon.
 
 ## Quick evaluation
 
@@ -71,6 +71,14 @@ For onboard execution, rolling denoising and computation-preserving runtime opti
 - **CG and CFG steering:** combines test-time objectives on predicted states with learned behavior conditioning.
 - **Rolling onboard inference:** reuses the denoising horizon across control ticks and optimizes runtime for 50 Hz operation on Jetson Orin NX.
 - **Simulation and hardware evidence:** demonstrates commands, transitions, steering, and disturbance response.
+
+**Release checklist**
+
+- [x] **Evaluation:** browser-based MuJoCo evaluation, G1 assets, and published checkpoints.
+- [ ] **Data collection and labeling:** motion collection, preprocessing, and dataset labeling tools.
+- [ ] **BC training:** behavior-cloning training code, configurations, and reproducibility assets.
+- [ ] **DAgger:** interactive data aggregation and policy refinement pipeline.
+- [ ] **Deployment:** onboard deployment and hardware-control tools.
 
 ## Demos
 
@@ -148,16 +156,6 @@ for the complete gallery.
   </tr>
 </table>
 
-## Resources
-
-| Resource | Description |
-| --- | --- |
-| [Project website](https://masteryip.github.io/predactor.github.io/) | Method overview, figures, authorship, and the complete demo gallery |
-| [Public repository](https://github.com/MasterYip/PredActor) | MuJoCo evaluation code and release updates |
-| [Evaluation artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts) | Hash-pinned PDP051 policy and G1 MotionCLIP checkpoints |
-| [Demo collection](https://masteryip.github.io/predactor.github.io/#evidence) | Simulation and hardware evidence in the browser |
-| [Paper](https://arxiv.org/abs/2609.24840) | arXiv preprint and citation |
-
 ## Acknowledgements
 
 We thank the authors of the following open-source projects:
@@ -179,22 +177,6 @@ We thank the authors of the following open-source projects:
   url={https://arxiv.org/abs/2609.24840},
 }
 ```
-
-## Release scope
-
-The public package contains the evaluation code and G1 assets required for the
-MuJoCo paths above. Learned weights remain in the separate Hugging Face
-artifact repository. Training, dataset generation, experiment orchestration,
-IsaacLab integration, and hardware control are intentionally excluded.
-
-## Release agenda
-
-| Release | Status | Scope |
-| --- | --- | --- |
-| Evaluation release | Available | Browser-based MuJoCo evaluation, G1 assets, and published evaluation checkpoints |
-| Data collection and labeling release | Planned | Motion collection, preprocessing, and dataset labeling tools |
-| BC training release | Planned | Behavior-cloning training code, configurations, and reproducibility assets |
-| DAgger release | Planned | Interactive data aggregation and policy refinement pipeline |
 
 ## License
 
