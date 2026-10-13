@@ -190,16 +190,16 @@ The contents of this repository are released under the [MIT License](LICENSE), u
 <table>
   <tr>
     <td width="50%" align="center" valign="top">
-      <strong>PredActor WeChat group · 中文交流群</strong><br><br>
+      <strong>PredActor WeChat group</strong><br><br>
       <a href="docs/assets/community/wechat-group-20261020.png"><img src="docs/assets/community/wechat-group-20261020.png" width="240" alt="PredActor WeChat discussion group QR code, valid through October 20, 2026"></a><br>
       <sub>Valid through October 20, 2026.</sub>
     </td>
     <td width="50%" align="center" valign="top">
-      <strong>Contact Lei Ye · 叶雷个人微信</strong><br><br>
-      <a href="docs/assets/community/wechat-contact.png"><img src="docs/assets/community/wechat-contact.png" width="240" alt="Lei Ye's personal WeChat contact QR code"></a><br>
+      <strong>Contact Author</strong><br><br>
+      <a href="docs/assets/community/wechat-contact.png"><img src="docs/assets/community/wechat-contact.png" width="240" alt="Author WeChat contact QR code"></a><br>
       <sub>Direct contact with the author.</sub>
     </td>
   </tr>
 </table>
 
-Scan a QR code with WeChat, or click it to view the full-size image. If the group QR code has expired or the group is full, add Lei Ye on WeChat.
+Scan a QR code with WeChat, or click it to view the full-size image. If the group QR code has expired or the group is full, contact the author on WeChat.
