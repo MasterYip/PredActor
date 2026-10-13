@@ -1,0 +1,223 @@
+# Data Collection Configuration for G1 Diffusion Dataset
+# This config follows the structure of g1_diffuse.yaml for consistency
+
+defaults:
+  - _self_
+
+# Output configuration
+output:
+  dir: "${oc.env:PREDACTOR_RAW_DATASET,../../Artifacts/dataset/g1_152fk_raw}"
+  zarr_name: "motion.zarr"
+  compressor: "disk"  # Use zstd compression for disk storage
+  chunk_length: -1  # -1 for auto, or specify chunk size
+  sort_by_motion_idx: true  # Sort episodes by motion_idx before saving (ensures motion1: eps0-N, motion2: eps(N+1)-2N, etc.)
+  # Fields to record — comment out any field you don't need to reduce dataset size.
+  # motion_idx is required when sort_by_motion_idx is true (added automatically if missing).
+  fields:
+    - act
+    - body_pos
+    - body_rot
+    - body_lin_vel
+    - body_ang_vel
+    - joint_pos
+    - joint_vel
+    - root_pos
+    - root_rot
+    - motion_idx
+    - projected_gravity
+    - base_lin_vel
+    - base_ang_vel
+    - last_actions
+    - motion_ref_root_pos
+    - motion_ref_root_rot
+    - motion_ref_root_lin_vel
+    - motion_ref_root_ang_vel
+    - motion_ref_joint_pos
+    # - motion_ref_joint_vel
+    # - motion_ref_body_pos
+    # - motion_ref_body_vel
+    # - motion_ref_body_pos_rel
+
+# Task and environment configuration
+task:
+  # name: "Tracking-Flat-G1-ProjGravObs-MNMLP-v0"
+  # name: "Tracking-Flat-G1-ProjGravObs-MNMLP-CollectData-v0"  # Old env (using extract_robot_state)
+  name: "Isaac-PegasusMoDye-DataCollection-G1-v0"  # New env with priv_obs for data collection with noise
+  num_envs: 1000
+  # max_episode_length: 1000 # unused
+  seed: 42
+
+# Typed IsaacLab environment-event overrides. A null velocity range removes
+# events.push_robot before gym.make; the default below preserves legacy behavior.
+env:
+  push_robot_velocity_range:
+    x: [-1.0, 1.0]
+    y: [-1.0, 1.0]
+    z: [-0.2, 0.2]
+    roll: [-0.52, 0.52]
+    pitch: [-0.52, 0.52]
+    yaw: [-0.78, 0.78]
+  push_robot_interval_range_s: [4.0, 6.0]
+
+# Policy checkpoint
+checkpoint:
+  path: "${oc.env:PREDACTOR_TRACKER_CHECKPOINT,../../Artifacts/checkpoints/rl_tracker/model_75000.pt}"
+  load_pickle_cfg: false  # Load env/agent config from pickle files
+
+# Motion data source
+motion:
+  # pattern: "Data10k-open/*"  # Pattern to match in artifacts directory
+  pattern: "g1_152fk/*"
+  # Full path: artifacts/{pattern}/motion.npz
+
+# Data collection settings
+collection:
+  # Collection mode:
+  #   - standard: Random sampling with quality filters (default)
+  #   - deterministic: M motions × N samples = M*N episodes for full coverage
+  mode: "deterministic"
+  
+  # Standard mode settings (random sampling)
+  len_to_save: 1000000  # Total timesteps to collect (standard mode only)
+  
+  # Deterministic mode settings (M×N sampling)
+  samples_per_motion: 40  # N: number of samples per motion (deterministic mode only)
+  # Directional yaw randomization: each sample_idx maps to an evenly-spaced yaw
+  # in [direction_range_lo, direction_range_hi) so the same motion is replayed
+  # toward different headings, enriching dataset coverage.
+  # Set to [-3.14159, 3.14159] for full 360° coverage across N samples.
+  # Set both to 0.0 to disable (default).
+  direction_range: [-3.14159, 3.14159]  # [lo, hi] in radians
+  # In deterministic mode:
+  #   - Total episodes = M (num motions) × N (samples_per_motion)
+  #   - Each motion sampled exactly N times from start to finish
+  #   - Failed episodes reassigned, not counted
+  #   - No random start position
+
+  min_episode_length: 100  # Minimum episode length for quality filter
+  min_mean_reward: null  # Optional: minimum mean reward per episode
+
+  # Stall timeout for deterministic mode: if progress exceeds this fraction
+  # (e.g. 0.90 = 90%) and no new episode is saved for stall_timeout_seconds,
+  # collection exits early to avoid hanging on unreachable final episodes.
+  # Default lowered to 0.90 so hard-motion tails (e.g. unreachable backward-crouch
+  # samples that fail 100%) do not hang forever at 97-99% with no zarr written.
+  stall_progress_threshold: 0.90  # fraction of target_episodes
+  stall_timeout_seconds: 120      # seconds of no progress before exit
+
+# Action noise injection (following BeyondMimic)
+# OU noise creates temporally correlated perturbations for better state diversity
+noise:
+  enable: true
+  type: "ou"  # Ornstein-Uhlenbeck noise
+  # OU noise parameters: η_{t+1} = η_t + θ(μ - η_t)Δt + σ√Δt ε_t
+  theta: 0.5      # Mean reversion rate
+  mu: 0.0         # Long-term mean
+  sigma: 0.2      # Joint-wise noise scale
+  dt: 0.02         # Time step
+  
+  # Alternative: Gaussian i.i.d. noise (set type to "gaussian")
+  # gaussian_std: 0.1
+
+  # IMPORTANT: Observation noise is applied in 
+  # `RLTracker/source/rl_tracker/rl_tracker/tasks/tracking/config/g1/diffusion_env_cfg.py`
+
+# Forward Kinematics (optional)
+# Use PyTorch FK to compute body positions/velocities for better alignment
+# with the real-hardware pipeline (which only has joint encoders + IMU).
+fk:
+  use_fk: true  # Enable FK computation (replaces body_pos and body_lin_vel)
+  fk_type: "torch"  # FK backend: "pinocchio" or "torch"
+  fk_device: "cuda"  # Device for FK computation: "cpu" or "cuda"
+  urdf_path: ""  # empty = auto-resolve from rl_tracker package assets; or set a custom path
+
+  # FK input noise simulation — models sensor imperfections on real hardware.
+  # When enabled, FK inputs are corrupted with realistic noise before FK
+  # computation, so the policy sees observations matching real-hardware conditions.
+  # This narrows the sim2real gap introduced by noisy IMU, encoders, and odometry.
+  noise:
+    enable: false  # Master switch — enable all noise channels below
+
+    # IMU orientation noise (root_rot quaternion).
+    # Yaw drift: slow Gauss-Markov process (mimics gyro integration drift).
+    # Jitter: white Gaussian per-axis (mimics accelerometer / magnetometer noise).
+    imu_orientation:
+      enable: true
+      yaw_drift:
+        enable: true
+        sigma: 0.0005     # rad/sqrt(s) — yaw random walk scale
+        tau: 60.0          # seconds — correlation time (decay=exp(-dt/tau))
+      yaw_jitter_sigma: 0.003          # rad — per-step white noise on yaw
+      roll_pitch_jitter_sigma: 0.001   # rad — per-step white noise on roll/pitch
+
+    # Joint encoder noise.
+    # White Gaussian + optional quantization (mimics magnetic encoder).
+    # Calibration bias is drawn once per episode (mimics factory offsets).
+    joint_encoder:
+      enable: true
+      white_noise_sigma: 0.001     # rad — per-step additive Gaussian
+      quantization_step: 0.0       # rad — quantisation step (0 = disabled)
+      calibration_bias_sigma: 0.01 # rad — per-episode static offset std
+
+    # Gyro (angular velocity) noise.
+    # Constant per-episode bias + white noise.
+    gyro:
+      enable: true
+      bias_sigma: 0.005        # rad/s — per-episode bias std
+      white_noise_sigma: 0.005 # rad/s — per-step white noise std
+
+    # Base linear velocity noise (velocity estimation drift).
+    # Gauss-Markov process with short correlation time.
+    base_velocity:
+      enable: true
+      drift:
+        enable: true
+        sigma: 0.05   # m/s/sqrt(s) — velocity random walk scale
+        tau: 2.0       # seconds — correlation time
+
+    # Base position noise (odometry drift).
+    # 2nd-order random walk: velocity bias → integrated position drift.
+    base_position:
+      enable: false   # disabled by default (less critical than IMU + joint noise)
+      drift:
+        enable: true
+        sigma: 0.02   # m/s/sqrt(s) — velocity bias random walk scale
+
+    # Dual recording: when true, also save the simulation ground-truth body_pos
+    # (before FK override) as the optional field "body_pos_sim" in the zarr dataset.
+    # This enables post-hoc FK-vs-simulation gap analysis.
+    record_ground_truth: false
+
+# MimicLite ONNX policy bridge (set enable: true to use MimicLite-trained policy
+# instead of the RLTracker PPO policy for data collection).
+mimic_lite:
+  enable: false
+  # Path to the ONNX model file
+  onnx_path: "logs/mimic_lite/policy-xua2csee-4000.onnx"
+  # Path to the deploy YAML (for action_scale, default_joint_pos, joint order)
+  deploy_yaml: "logs/mimic_lite/policy-xua2csee-4000.yaml"
+  # Path to a simplified 154-d deploy ONNX (overrides onnx_path if set)
+  deploy_onnx_path: ""
+  # Action scale override (MimicLite canonical joint order, 29 values).
+  # Loaded from deploy_yaml if not specified.
+  action_scale: []
+  # Default joint position override (IsaacLab joint order, 29 values).
+  default_joint_pos: []
+
+# Visualization
+visualization:
+  headless: true
+  enable_cameras: false
+  livestream: 0  # 0=off, 1=native (deprecated), 2=WebRTC (browser at port 49100)
+
+# Logging
+logging:
+  print_interval: 100  # Print stats every N steps
+  save_metadata: true
+
+# Diagnostic-only bounded first-attempt capture. It never writes a partial
+# production zarr and is disabled for normal collection.
+teacher_canary:
+  enable: false
+  report_path: ""
+  trace_dir: ""

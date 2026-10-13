@@ -1,0 +1,82 @@
+# Data Dyeing Configuration
+# Encodes collected motion data into CLIP latent space using MotionCLIP
+
+# Input dataset configuration
+input:
+  zarr_path: "${oc.env:PREDACTOR_RAW_ZARR,Artifacts/dataset/g1_152fk_raw/motion.zarr}"
+  
+  # Option to dye from original motion files instead of collected samples
+  # More efficient for deterministic collection: encode each unique motion once, 
+  # then attach to all samples based on motion_idx
+  dyeing_from_origin_motion: true  # Set to true to use original npz motions
+  motion_pattern: "g1_152fk/*"
+  motion_base_path: "${oc.env:PREDACTOR_MOTION_ROOT,Artifacts/motions}"
+  
+  # Length mismatch handling policy (when dyeing_from_origin_motion=true)
+  # Options:
+  #   - "clip_or_drop": If sample < motion, clip motion to sample length; if sample > motion, drop episode
+  #   - "drop_all": Drop any episode with length mismatch (safest, current default)
+  #   - "interpolate": Use linear interpolation to align all mismatches (may lose quality)
+  length_mismatch_policy: "clip_or_drop"
+  
+# MotionCLIP model configuration
+motionclip:
+  checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT,Artifacts/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar}"
+  device: "cuda"  # 'cuda' or 'cpu'
+  
+# Motion encoding configuration
+encoding:
+  # FPS conversion settings
+  # Collected motion is at origin_fps, but MotionCLIP expects target_fps
+  origin_fps: 50  # FPS of collected motion data
+  target_fps: 30  # FPS expected by MotionCLIP model
+  interp_method: 'linear'  # Interpolation method: 'linear', 'nearest', 'cubic'
+  
+  # Window size for motion sequence (should match model's num_frames)
+  window_size: 60  # frames
+  
+  # How to handle boundaries (start/end of sequences)
+  # Options: 'pad', 'truncate', 'mirror'
+  boundary_mode: 'pad'  # FIXME: If using FPS resampling, unknown behavior with `truncate`
+  
+  # Batch size for encoding (larger = faster but more memory)
+  batch_size: 8192
+  
+  # Pose representation used by the model
+  # Options: 'xyz', 'rot6d', 'posquat', 'posvel'
+  pose_rep: 'xyz'
+  
+  # Whether model uses translation
+  translation: true
+  
+  # Whether model uses global orientation
+  glob: true
+  
+  # Whether to use G1 format
+  use_g1: true
+  
+  # Text alignment configuration (bridges semantic gap between motion and text)
+  # When enabled, motion embeddings are aligned to text embedding space
+  # by computing vocabulary-weighted averages of CLIP text embeddings
+  use_text_alignment: true  # Set to true to enable text-aligned embeddings
+  text_alignment_temperature: 0.01  # Temperature for text alignment softmax (lower = sharper, higher = smoother)
+  vocabulary_path: "${oc.env:PREDACTOR_TEXT_VOCAB,PredActor/collection/scripts/data_dyeing/text_vocab.yaml}"
+
+# Output configuration
+output:
+  # Output zarr path (if same as input, will overwrite)
+  zarr_path: "${oc.env:PREDACTOR_DYED_ZARR,Artifacts/dataset/g1_152fk/motion_dyed_text_t0.01.zarr}"
+  
+  # Name of the field to add to dataset
+  latent_field_name: "motion_latent"  # Will add field with shape [T, 512]
+  
+  # Whether to overwrite existing latent field
+  overwrite: true
+  
+  # Compression settings
+  compressor: "default"  # 'default', 'blosc', or null
+
+# Logging
+logging:
+  verbose: true
+  log_interval: 100  # Log every N batches
