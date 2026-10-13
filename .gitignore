@@ -3,6 +3,7 @@
 .hf_upload_staging/
 Artifacts/
 eval_output/
+outputs/
 __pycache__/
 *.py[cod]
 *.egg-info/

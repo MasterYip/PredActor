@@ -17,11 +17,25 @@ Usage:
 import argparse
 import shutil
 import sys
+import time
 from pathlib import Path
 from _hf_common import (
     display_local, entry_size, load_manifest, resolve_local,
     prompt_huggingface_hub, verify_entry,
 )
+
+
+def _retry(label: str, operation, attempts: int = 5):
+    """Retry transient Hub/CDN failures without discarding completed files."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return operation()
+        except Exception as exc:
+            if attempt == attempts:
+                raise
+            delay = min(2 ** (attempt - 1), 16)
+            print(f"    [RETRY {attempt}/{attempts}] {label}: {exc}; waiting {delay}s")
+            time.sleep(delay)
 
 
 def _check_entry(api, repo_id: str, repo_type: str, entry: dict, local: Path):
@@ -43,7 +57,11 @@ def _check_entry(api, repo_id: str, repo_type: str, entry: dict, local: Path):
     kind = entry.get("kind", "directory")
     if kind == "file":
         try:
-            info = api.repo_info(repo_id=repo_id, repo_type=repo_type, files_metadata=True)
+            info = _retry(
+                f"list {hf_path}",
+                lambda: api.repo_info(
+                    repo_id=repo_id, repo_type=repo_type, files_metadata=True),
+            )
             remote = next((item for item in info.siblings if item.rfilename == hf_path), None)
         except Exception:
             return "absent", []
@@ -58,19 +76,35 @@ def _check_entry(api, repo_id: str, repo_type: str, entry: dict, local: Path):
 
     # Build {repo_path: size} from HF — RepoFile has .size; RepoFolder does not.
     try:
-        hf_files = {
-            item.path: item.size
-            for item in api.list_repo_tree(
+        tree = _retry(
+            f"list {hf_path}",
+            lambda: list(api.list_repo_tree(
                 repo_id=repo_id,
                 repo_type=repo_type,
                 path_in_repo=hf_path,
                 recursive=True,
-            )
+            )),
+        )
+        hf_files = {
+            item.path: item.size
+            for item in tree
             if getattr(item, "size", None) is not None   # files only
         }
     except Exception:
-        # list_repo_tree not available in older huggingface_hub — fall back to absent
-        return "absent", []
+        # Older clients and some proxies fail on the recursive tree endpoint.
+        # The flat repository listing still gives a complete resumable path set.
+        try:
+            prefix = hf_path.rstrip("/") + "/"
+            hf_files = {
+                path: None
+                for path in _retry(
+                    f"list repository paths for {hf_path}",
+                    lambda: api.list_repo_files(repo_id=repo_id, repo_type=repo_type),
+                )
+                if path.startswith(prefix)
+            }
+        except Exception:
+            return "absent", []
 
     if not local.exists():
         return "absent", list(hf_files.keys())
@@ -101,12 +135,15 @@ def _download_files(repo_id: str, repo_type: str, endpoint: str,
         rel = Path(hf_repo_path).relative_to(hf_path_prefix)
         dest = local if kind == "file" else local / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        tmp = hf_hub_download(
-            repo_id=repo_id,
-            repo_type=repo_type,
-            filename=hf_repo_path,
-            token=token,
-            endpoint=endpoint,
+        tmp = _retry(
+            f"download {hf_repo_path}",
+            lambda: hf_hub_download(
+                repo_id=repo_id,
+                repo_type=repo_type,
+                filename=hf_repo_path,
+                token=token,
+                endpoint=endpoint,
+            ),
         )
         shutil.copy2(tmp, dest)
         print(f"      ↳ {rel}")
@@ -117,12 +154,16 @@ def _download_full(api, repo_id: str, repo_type: str, hf_path: str,
     """Download the entire hf_path subtree via snapshot_download (original behavior)."""
     staging_dir = staging_root / hf_path
     staging_dir.mkdir(parents=True, exist_ok=True)
-    api.snapshot_download(
-        repo_id=repo_id,
-        repo_type=repo_type,
-        allow_patterns=[f"{hf_path}/**", f"{hf_path}/*"],
-        local_dir=str(staging_root),
-        token=token,
+    _retry(
+        f"download {hf_path}",
+        lambda: api.snapshot_download(
+            repo_id=repo_id,
+            repo_type=repo_type,
+            allow_patterns=[f"{hf_path}/**", f"{hf_path}/*"],
+            local_dir=str(staging_root),
+            token=token,
+            max_workers=2,
+        ),
     )
     staged = staging_dir
     if not staged.exists():

@@ -20,9 +20,8 @@
 </p>
 
 > [!IMPORTANT]
-> The evaluation code is available now, with browser-based MuJoCo evaluation
-> of the published PDP051 checkpoint. Training, data collection, and robot
-> deployment releases are coming soon.
+> Evaluation, data collection, MotionCLIP labeling, and BC training code are
+> available. DAgger and robot deployment releases are coming next.
 
 ## Quick evaluation
 
@@ -47,6 +46,44 @@ the training repositories are not required.
 For a headless startup, use `uv run --locked predactor-eval --headless
 --web-no-browser`. Run `uv run --locked predactor-eval --help` for optional
 checkpoint, config, device, and Web UI overrides.
+
+## Reproduce collection and training
+
+The public pipeline takes three external inputs: the 152 retargeted G1 motion
+trajectories, the released RLTracker teacher checkpoint, and the G1 MotionCLIP
+checkpoint. Download them from the artifact repository with:
+
+```bash
+uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_152fk
+```
+
+```bash
+# IsaacLab collection environment
+conda create -n predactor-collection python=3.10 -y
+conda activate predactor-collection
+bash PredActor/collection/install.sh
+
+# Collect the raw 152-motion dataset
+bash PredActor/collection/collect_dataset.sh \
+  --mode deterministic --samples_per_motion 1 --num_envs 16 --headless
+
+# Return to the repository uv environment, label, then train
+conda deactivate
+uv run python PredActor/collection/scripts/data_dyeing/data_dyeing.py
+uv run python PredActor/train.py \
+  --cfg g1prdp_cond_diffuse.yaml --exp_name predactor_bc \
+  dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \
+  dataset.zarr_path=motion_dyed_text_t0.01.zarr \
+  training.num_epochs=50 training.seed=42 dataloader.num_workers=16 \
+  logging.mode=offline
+```
+
+Artifact placement and environment details are in the
+[collection](docs/data_collection.md),
+[data dyeing](docs/data_dyeing.md), and
+[training](docs/training.md) guides. The
+[release synchronization guide](docs/release_sync.md) explains which files
+come from PegasusMoDye and which files are maintained by this repository.
 
 ## Overview
 
@@ -75,8 +112,8 @@ For onboard execution, rolling denoising and computation-preserving runtime opti
 **Release checklist**
 
 - [x] **Evaluation:** browser-based MuJoCo evaluation, G1 assets, and published checkpoints.
-- [ ] **Data collection and labeling:** motion collection, preprocessing, and dataset labeling tools.
-- [ ] **BC training:** behavior-cloning training code, configurations, and reproducibility assets.
+- [x] **Data collection and labeling:** IsaacLab motion collection and MotionCLIP dataset labeling tools.
+- [x] **BC training:** behavior-cloning training code, configurations, and reproducibility smoke test.
 - [ ] **DAgger:** interactive data aggregation and policy refinement pipeline.
 - [ ] **Deployment:** onboard deployment and hardware-control tools.
 

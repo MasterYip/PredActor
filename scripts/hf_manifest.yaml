@@ -69,6 +69,22 @@ entries:
         size_bytes: 542749069
         sha256: 66a127df4958b346089b2020f2705c7456d9db0ee8b4bd9518608b708b35fc3c
 
+  - hf_path: checkpoints/rl_tracker
+    local_path: Artifacts/checkpoints/rl_tracker
+    kind: directory
+    enabled: true
+    notes: RLTracker teacher checkpoint used by the public IsaacLab collector
+    files:
+      model_75000.pt:
+        size_bytes: 87408687
+        sha256: 0043c99ca89b1e45e49be7fdc95dec261ab9df9a6dfeaf11cca739390421aa52
+
+  - hf_path: motions/g1_152fk
+    local_path: Artifacts/motions/g1_152fk
+    kind: directory
+    enabled: true
+    notes: 152 retargeted Unitree G1 trajectories used by collection, dyeing, and PDP051-style BC training
+
   - hf_path: dataset
     local_path: Artifacts/dataset
     kind: directory
