@@ -1,7 +1,7 @@
 # Public release synchronization
 
 The public repository is assembled from two ownership domains. Exported
-runtime files come from a pinned PegasusMoDye commit; public packaging,
+runtime files come from pinned component commits; public packaging,
 artifacts, and presentation files stay under the `PredActor` repository.
 
 ## Exported from PegasusMoDye
@@ -19,6 +19,20 @@ dist/collection_overlay/collection/          -> PredActor/collection/
 dist/collection_overlay/docs/*.md            -> docs/*.md
 dist/overlay/assets/...                      -> PredActor/assets/...
 ```
+
+The additive motion encoder profile maps a separately pinned MoDyeEnc commit:
+
+```text
+MoDyeEnc/finetune.py                         -> PredActor/motion_encoder/finetune.py
+MoDyeEnc/prepare_data.py                     -> PredActor/motion_encoder/prepare_data.py
+MoDyeEnc/src/ (explicit allowlist)           -> PredActor/motion_encoder/src/
+MoDyeEnc/LICENSE                            -> PredActor/motion_encoder/LICENSE
+dist/motion_encoder_overlay/docs/           -> docs/
+```
+
+Its rules live in `PDPlanner/dist/policy.motion_encoder.json` and
+`.distignore.motion_encoder-source`. Both profiles export this synchronization
+guide from the same `dist/collection_overlay/docs/release_sync.md` source.
 
 The exact file allowlist and text adaptations are defined by
 `PDPlanner/dist/policy.collection.json`. A new PegasusMoDye branch or commit
@@ -55,12 +69,31 @@ When PegasusMoDye changes:
 2. Run `PDPlanner/tools/dist_export.py --profile collection`.
 3. Run `PDPlanner/tools/dist_audit.py` and keep its manifest and checksums as
    release evidence outside the public Git tree.
-4. Replace the exported `PredActor/` code paths and copy the exported guides
-   into the public root `docs/`.
+4. Copy only the files enumerated in the generated distribution manifest.
+   Payload `docs/` files go to root `docs/`; all other payload files go under
+   public `PredActor/`. Verify their SHA-256 values after copying.
 5. Review public-owned files separately. Do not replace the README, HF
    synchronization scripts, artifact layout, or `docs/assets/` from an export.
 
+For encoder changes, run the additive profile separately:
+
+```bash
+python tools/dist_export.py --source . --ref <pdplanner-commit> \
+  --profile motion_encoder --project-source <modyeenc-checkout> \
+  --project-ref <modyeenc-commit> --output <new-payload-directory> \
+  --evidence-dir <new-evidence-directory>
+```
+
+Collection exports do not own `PredActor/motion_encoder/` or
+`docs/motion_encoder.md`; preserve those paths when refreshing collection.
+Encoder exports do not own evaluation, collection, training, or root packaging.
+Do not use whole-tree `rsync --delete` or the whole-repository `dist_sync.py`
+on an additive encoder payload. The latter rejects this profile. Removal of a
+previously exported file needs a separately reviewed list of obsolete owned
+paths; absence from one profile is not evidence that another profile's file
+is obsolete.
+
 The public training command uses the exported
 `PredActor/diffusion_policy/config_files/g1prdp_cond_diffuse.yaml`, matching the
-PDP051 architecture and schedule while resolving the dataset path through
+released G1 architecture and 50-epoch recipe while resolving the dataset path through
 `Artifacts/dataset/g1_152fk`.
