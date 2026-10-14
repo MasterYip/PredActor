@@ -59,7 +59,7 @@ uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_15
 
 ```bash
 # IsaacLab collection environment
-conda create -n predactor-collection python=3.10 -y
+conda create --override-channels -c conda-forge -n predactor-collection python=3.10 -y
 conda activate predactor-collection
 bash PredActor/collection/install.sh
 

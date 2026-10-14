@@ -13,8 +13,9 @@ EXTENSION_TOML_DATA = toml.load(os.path.join(EXTENSION_PATH, "config", "extensio
 # Minimum dependencies required prior to installation
 INSTALL_REQUIRES = [
     "psutil",
-    "onnxscript",
-    "wandb>=0.19",
+    "onnxscript==0.1.0",
+    "wandb==0.19.11",
+    "pytorch-kinematics==0.9.1",
 ]
 
 # Installation operation
