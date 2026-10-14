@@ -85,6 +85,24 @@ Artifact placement and environment details are in the
 [release synchronization guide](docs/release_sync.md) explains which files
 come from PegasusMoDye and which files are maintained by this repository.
 
+## Fine-tune the motion encoder
+
+Fine-tune the released G1 MotionCLIP checkpoint on your own motion/text pairs
+using the same `uv` environment. The [motion encoder guide](docs/motion_encoder.md)
+covers annotation format, preprocessing, fine-tuning, resume, and using the
+updated encoder for dataset labeling.
+
+```bash
+uv run --locked python PredActor/motion_encoder/prepare_data.py \
+  --annotations Artifacts/encoder_annotations.json \
+  --output Artifacts/dataset/motion_encoder/train.npz
+uv run --locked python PredActor/motion_encoder/finetune.py \
+  --data Artifacts/dataset/motion_encoder/train.npz \
+  --init-checkpoint Artifacts/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar \
+  --output Artifacts/runs/motion_encoder/finetune \
+  --epochs 50 --num-workers 16
+```
+
 ## Overview
 
 **PredActor** augments action diffusion with an internal future-state trajectory for look-ahead guidance while retaining direct action execution. Within a joint state-action formulation, it predicts future states and actions from proprioceptive history and optional task context. Unlike a generator-tracker pipeline, predicted states remain inside the policy rather than becoming motion references for a separate tracker. Unlike action-only diffusion, the policy provides an explicit future-state trajectory for guidance.
