@@ -80,28 +80,24 @@ uv run python PredActor/train.py \
 
 Artifact placement and environment details are in the
 [collection](docs/data_collection.md),
-[data dyeing](docs/data_dyeing.md), and
-[training](docs/training.md) guides. The
-[release synchronization guide](docs/release_sync.md) explains which files
-come from PegasusMoDye and which files are maintained by this repository.
+[data dyeing](docs/data_dyeing.md),
+[training](docs/training.md), and
+[motion encoder](docs/motion_encoder.md) guides.
 
-## Fine-tune the motion encoder
+## Train the motion encoder
 
-Fine-tune the released G1 MotionCLIP checkpoint on your own motion/text pairs
-using the same `uv` environment. The [motion encoder guide](docs/motion_encoder.md)
-covers annotation format, preprocessing, fine-tuning, resume, and using the
-updated encoder for dataset labeling.
+Train G1 MotionCLIP with the original G1 xyz recipe: G1-retargeted AMASS motions,
+BABEL labels, and a trainable CLIP text encoder. Follow the
+[motion encoder guide](docs/motion_encoder.md) to prepare the training database,
+then run from the repository root:
 
 ```bash
-uv run --locked python PredActor/motion_encoder/prepare_data.py \
-  --annotations Artifacts/encoder_annotations.json \
-  --output Artifacts/dataset/motion_encoder/train.npz
-uv run --locked python PredActor/motion_encoder/finetune.py \
-  --data Artifacts/dataset/motion_encoder/train.npz \
-  --init-checkpoint Artifacts/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar \
-  --output Artifacts/runs/motion_encoder/finetune \
-  --epochs 50 --num-workers 16
+uv run --locked bash PredActor/motion_encoder/scripts/train_g1_xyz.sh
 ```
+
+This runs 100 epochs with 16 data-loader workers and writes
+`PredActor/motion_encoder/exps/g1-model-xyz-clip/checkpoint_0100.pth.tar`.
+It does not initialize from the released MotionCLIP checkpoint.
 
 ## Overview
 
