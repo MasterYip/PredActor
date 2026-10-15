@@ -67,9 +67,11 @@ bash PredActor/collection/install.sh
 bash PredActor/collection/collect_dataset.sh \
   --mode deterministic --samples_per_motion 1 --num_envs 16 --headless
 
-# Return to the repository uv environment, label, then train
+# Return to the repository uv environment, dye the collected trajectories, then train
 conda deactivate
 uv run python PredActor/collection/scripts/data_dyeing/data_dyeing.py
+
+# Paper-profile conditioned PRDP training
 uv run python PredActor/train.py \
   --cfg g1prdp_cond_diffuse.yaml --exp_name predactor_bc \
   dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \
@@ -77,6 +79,20 @@ uv run python PredActor/train.py \
   training.num_epochs=50 training.seed=42 dataloader.num_workers=16 \
   logging.mode=offline
 ```
+
+To train the condition-free PRDP baseline on the same collected/dyed zarr:
+
+```bash
+uv run python PredActor/train.py \
+  --cfg g1prdp_diffuse.yaml --exp_name predactor_bc_unconditional \
+  dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \
+  dataset.zarr_path=motion_dyed_text_t0.01.zarr \
+  training.seed=42 dataloader.num_workers=16 \
+  logging.mode=offline
+```
+
+`g1prdp_diffuse.yaml` does not use the text latent at inference; the same dyed
+zarr is used so both runs share the collection and dataset layout.
 
 Artifact placement and environment details are in the
 [collection](docs/data_collection.md),

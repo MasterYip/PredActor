@@ -68,7 +68,8 @@ The wrapper resolves the motions and checkpoint from `Artifacts/` and writes
 `Artifacts/dataset/g1_152fk_raw/motion.zarr`. Command-line `--checkpoint`,
 `--motion_file`, and `--output_dir` values override those defaults.
 
-Before a long run, validate the exported layout:
+The collection command is the first step of the normal reproduce flow. An
+optional layout check is available when debugging an installation:
 
 ```bash
 python PredActor/collection/scripts/collection_preflight.py
@@ -76,4 +77,5 @@ python PredActor/collection/scripts/collection_preflight.py
 
 Use `--visualize` for the native Isaac Sim viewer or `--headless --livestream
 2` for WebRTC. Run `bash PredActor/collection/collect_dataset.sh --help` for
-the complete collection and noise options.
+the complete collection and noise options. After collection, continue with
+the dyeing command in the next guide; no separate preflight step is required.

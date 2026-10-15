@@ -31,6 +31,24 @@ uv run python PredActor/train.py \
   logging.mode=offline
 ```
 
+This is the conditioned paper-profile run. For the condition-free PRDP
+baseline, use the same dataset directory and a separate output name:
+
+```bash
+uv run python PredActor/train.py \
+  --cfg g1prdp_diffuse.yaml \
+  --exp_name predactor_bc_unconditional \
+  dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \
+  dataset.zarr_path=motion_dyed_text_t0.01.zarr \
+  training.seed=42 \
+  dataloader.num_workers=16 \
+  logging.mode=offline
+```
+
+The unconditional config uses the same collected/dyed zarr layout but does not
+condition the policy on text. Keep the two output directories separate so their
+resolved configs and checkpoints remain unambiguous.
+
 Use `training.device=cpu` for CPU training or `--gpu N` to select a CUDA
 device. The supported dataset fields and G1 ordering are implemented in
 `PredActor/diffusion_policy/dataset/g1_dataset.py`.
