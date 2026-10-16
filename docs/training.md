@@ -53,6 +53,25 @@ Use `training.device=cpu` for CPU training or `--gpu N` to select a CUDA
 device. The supported dataset fields and G1 ordering are implemented in
 `PredActor/diffusion_policy/dataset/g1_dataset.py`.
 
+## Evaluate the trained checkpoint
+
+Training prints the run directory under `outputs/`. Set `run_dir` to that
+directory and launch the Web UI from the repository root:
+
+```bash
+run_dir="outputs/<run-directory>"
+uv run --locked predactor-eval \
+  --checkpoint "$run_dir/checkpoints/latest.ckpt" \
+  --config "$run_dir/resolved_config.yaml" \
+  --output_dir "$run_dir/eval" \
+  --web-ui
+```
+
+Open `http://127.0.0.1:8765/` and enter a motion command. The same command
+works for the condition-free model, but text commands do not affect that model.
+Add `--web-perturb` to enable mouse perturbations, or `--web-port 8766` if
+port 8765 is already in use.
+
 The full reproduction flow is:
 
 ```text

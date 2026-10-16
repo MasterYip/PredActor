@@ -1,4 +1,4 @@
-# Train the G1 motion encoder
+# Train the G1 motion encoder (Experimental)
 
 The G1 MotionCLIP model maps 60-frame robot motions and text descriptions into
 a shared 512-dimensional space. This guide follows the G1 XYZ training recipe

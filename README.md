@@ -99,7 +99,23 @@ Artifact placement and environment details are in the
 [training](docs/training.md), and
 [motion encoder](docs/motion_encoder.md) guides.
 
-## Train the motion encoder
+## Evaluate your trained model
+
+Set `run_dir` to the directory printed by training:
+
+```bash
+run_dir="outputs/<run-directory>"
+uv run --locked predactor-eval \
+  --checkpoint "$run_dir/checkpoints/latest.ckpt" \
+  --config "$run_dir/resolved_config.yaml" \
+  --output_dir "$run_dir/eval" \
+  --web-ui
+```
+
+Open `http://127.0.0.1:8765/` to control the model. Add `--web-perturb` for
+mouse perturbations or `--web-port 8766` to use another port.
+
+## Train the motion encoder (Experimental)
 
 Train G1 MotionCLIP with the original G1 xyz recipe: G1-retargeted AMASS motions,
 BABEL labels, and a trainable CLIP text encoder. Follow the
