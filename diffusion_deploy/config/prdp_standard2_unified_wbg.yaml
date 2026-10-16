@@ -1,0 +1,28 @@
+# Full planar fast-WBG profile for the Standard2 unified joystick interface.
+#
+# This is a standalone whole_body_guidance_config consumed by
+# tools/export_policy.py --wbg-config. Standard2 omits base_lin_vel from the
+# 93-D robot condition, but WBG still operates on the actor's FK-derived 192-D
+# G1 state. Keep --obs-profile G1, --use-fk and classifier reuse_x0 together.
+enabled: true
+profile: g1_standard
+guidance_mode: classifier
+mode: simple
+enable_zeta_comp: false
+enable_damping_comp: false
+guidances:
+  vx_guide:
+    enabled: true
+    kp: 1.0
+    command: 0.0
+    body_indices: [0, 9]
+  vy_guide:
+    enabled: true
+    kp: 1.0
+    command: 0.0
+    body_indices: [0, 3, 4, 5, 6, 7, 8, 9]
+  wz_guide:
+    enabled: true
+    kp: 1.0
+    command: 0.0
+    body_indices: [0, 3, 4, 5, 6, 7, 8, 9]

@@ -1,0 +1,38 @@
+# Copy this runner.unified_command block into an exported deploy config.
+# The feature defaults off when this block is absent. Generate the four files
+# and exact hashes with tools/export_unified_command_latents.py.
+runner:
+  unified_command:
+    enabled: false
+    joystick_device: /dev/input/js0
+    joystick_mapping: xbox_new
+    deadzone: 0.10
+    dpad_debounce_ms: 150
+    wbg:
+      enabled: true
+      max_vx: 5.0
+      max_vy: 5.0
+      max_wz: 5.0
+      kp: 1.0
+      controls:
+        l2_kp_enabled: true
+        kp_axis: l2
+        kp_unpressed: 1.0
+        kp_pressed: 0.0
+        lb_toggle_enabled: true
+        toggle_button: LB
+        toggle_debounce_ms: 150
+    motions:
+      - {name: stand, dpad: up, path: command_latents/stand.f32, hash: "fnv1a64:REPLACE_ME", dim: 512}
+      - {name: walk, dpad: right, path: command_latents/walk.f32, hash: "fnv1a64:REPLACE_ME", dim: 512}
+      - {name: jog, dpad: down, path: command_latents/jog.f32, hash: "fnv1a64:REPLACE_ME", dim: 512}
+      - {name: "squat down", dpad: left, path: command_latents/squat_down.f32, hash: "fnv1a64:REPLACE_ME", dim: 512}
+    compatibility_udp:
+      enabled: false
+      host: 127.0.0.1
+      condition_port: 9877
+      wbg_port: 9879
+    telemetry:
+      enabled: false
+      host: 127.0.0.1
+      port: 9880

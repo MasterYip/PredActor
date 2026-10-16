@@ -1,0 +1,80 @@
+# G1 Robot Diffusion Policy Deployment Configuration
+# Mirrors the Python Hydra config structure.
+# All values here match the G1_Dataset_RLObs profile as an example.
+
+model:
+  backend: "torch"              # "torch" | "onnx"
+  path: "models/g1_policy.pt"  # TorchScript (.pt) or ONNX (.onnx) model
+
+  # Policy dimensions — must match the exported model exactly
+  obs_dim: 96                   # G1_RLObs = 96, G1 = 192, G1_Q = 70
+  action_dim: 29                # Number of DOF
+  cond_dim: 0                   # 0 = unconditional; 512 for CLIP conditioning
+
+  # Temporal parameters
+  n_obs_steps: 4                # n_past_steps fed to policy
+  n_future_steps: 16            # Predicted future steps
+  # horizon = n_obs_steps + n_future_steps = 20
+
+  denoising_steps: 100          # DDPM reverse steps (backbone export mode only)
+
+  # Obs profile selects which state_normalize() implementation to use
+  # G1 | G1_EE | G1_Q | G1_RLObs
+  obs_profile: "G1_RLObs"
+
+env:
+  network_interface: ""         # DDS interface (empty = auto-detect)
+  control_dt: 0.02              # Control period [s] — 50 Hz
+  num_dof: 29
+  use_pr_mode: true             # PR mode (ankle impedance) vs AB mode
+  enable_safety_checks: true
+
+  # Forward kinematics via Pinocchio (requires -DUSE_FK=ON at build time)
+  use_fk: false                 # Set to true to enable full body FK
+  urdf_path: ""                 # Path to G1 URDF, e.g. assets/unitree_description/urdf/g1_29dof.urdf
+
+  # PD gains in MuJoCo SDK joint order [29]
+  Kp: [60, 60, 60, 100, 40, 40,
+       60, 60, 60, 100, 40, 40,
+       60, 40, 40,
+       40, 40, 40, 40, 40, 40, 40,
+       40, 40, 40, 40, 40, 40, 40]
+
+  Kd: [1, 1, 1, 2, 1, 1,
+       1, 1, 1, 2, 1, 1,
+       1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1]
+
+runner:
+  delay_action_step: 0.0        # signed; fractions require two noise-0 endpoints
+  max_steps: 2000
+  realtime_mode: true
+  reset_height: 0.3             # Auto-reset if root_z < threshold (unused on real robot)
+
+  # Async CLIP conditioning via UDP
+  # The Python clip_teleop/clip_interp sends float32 arrays over UDP.
+  enable_cond_udp: false
+  cond_udp_host: "127.0.0.1"
+  cond_udp_port: 9877
+
+normalization:
+  # Exported from Python checkpoint via export_policy.py:
+  #   normalizer["obs"].params_dict["min"/"max"].tolist()
+  #
+  # Replace [...] with actual values from your training run.
+  obs:
+    mode: "linear"    # limits-based: x_norm = x * scale + offset in [-1,1]
+    min: []           # [obs_dim] floats — fill from Python export
+    max: []           # [obs_dim] floats — fill from Python export
+
+  action:
+    mode: "linear"
+    min: []           # [action_dim] floats
+    max: []           # [action_dim] floats
+
+  # Only needed when cond_dim > 0
+  # cond:
+  #   mode: "standard"    # gaussian: x_norm = (x - mean) / std
+  #   mean: []
+  #   std:  []

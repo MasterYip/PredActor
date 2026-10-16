@@ -21,7 +21,8 @@
 
 > [!IMPORTANT]
 > Evaluation, data collection, MotionCLIP labeling, and BC training code are
-> available. DAgger and robot deployment releases are coming next.
+> available. The diffusion-deploy source and release runbooks are included;
+> deployed policy packages are supplied separately.
 
 ## Quick evaluation
 
@@ -46,6 +47,21 @@ the training repositories are not required.
 For a headless startup, use `uv run --locked predactor-eval --headless
 --web-no-browser`. Run `uv run --locked predactor-eval --help` for optional
 checkpoint, config, device, and Web UI overrides.
+
+## Deployment
+
+The `diffusion_deploy/` directory contains the C++ runtime, exporter, G1
+assets, platform lock, and launch scripts. The short release guide covers the
+paper-default policy export and the three supported paths:
+
+- [MuJoCo sim2sim](docs/deployment.md#a-mujoco-sim2sim)
+- [wired workstation to G1](docs/deployment.md#b-wired-workstation-deployment)
+- [onboard Jetson G1](docs/deployment.md#c-onboard-g1-deployment)
+
+The latest deployment reference is the Task165 PDP067 Standard2 full DDIM-2
+package. Its 605-D condition excludes `base_lin_vel`; the package and learned
+graph are external to this source repository and must be checked by SHA-256
+before installation.
 
 ## Reproduce collection and training
 
@@ -160,7 +176,7 @@ For onboard execution, rolling denoising and computation-preserving runtime opti
 - [x] **Data collection and labeling:** IsaacLab motion collection and MotionCLIP dataset labeling tools.
 - [x] **BC training:** behavior-cloning training code, configurations, and reproducibility smoke test.
 - [ ] **DAgger:** interactive data aggregation and policy refinement pipeline.
-- [ ] **Deployment:** onboard deployment and hardware-control tools.
+- [x] **Deployment:** diffusion-deploy source, G1 assets, export tooling, and runbooks.
 
 ## Demos
 
