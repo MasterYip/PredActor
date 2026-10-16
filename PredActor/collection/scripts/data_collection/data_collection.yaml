@@ -48,15 +48,16 @@ task:
   seed: 42
 
 # Typed IsaacLab environment-event overrides. A null velocity range removes
-# events.push_robot before gym.make; the default below preserves legacy behavior.
+# events.push_robot before gym.make.
 env:
-  push_robot_velocity_range:
-    x: [-1.0, 1.0]
-    y: [-1.0, 1.0]
-    z: [-0.2, 0.2]
-    roll: [-0.52, 0.52]
-    pitch: [-0.52, 0.52]
-    yaw: [-0.78, 0.78]
+  push_robot_velocity_range: null
+  # push_robot_velocity_range:
+  #   x: [-1.0, 1.0]
+  #   y: [-1.0, 1.0]
+  #   z: [-0.2, 0.2]
+  #   roll: [-0.52, 0.52]
+  #   pitch: [-0.52, 0.52]
+  #   yaw: [-0.78, 0.78]
   push_robot_interval_range_s: [4.0, 6.0]
 
 # Policy checkpoint
@@ -81,13 +82,13 @@ collection:
   len_to_save: 1000000  # Total timesteps to collect (standard mode only)
   
   # Deterministic mode settings (M×N sampling)
-  samples_per_motion: 40  # N: number of samples per motion (deterministic mode only)
+  samples_per_motion: 50  # N: number of samples per motion (deterministic mode only)
   # Directional yaw randomization: each sample_idx maps to an evenly-spaced yaw
   # in [direction_range_lo, direction_range_hi) so the same motion is replayed
   # toward different headings, enriching dataset coverage.
   # Set to [-3.14159, 3.14159] for full 360° coverage across N samples.
   # Set both to 0.0 to disable (default).
-  direction_range: [-3.14159, 3.14159]  # [lo, hi] in radians
+  direction_range: [0.0, 0.0]  # [lo, hi] in radians
   # In deterministic mode:
   #   - Total episodes = M (num motions) × N (samples_per_motion)
   #   - Each motion sampled exactly N times from start to finish
@@ -103,7 +104,7 @@ collection:
   # Default lowered to 0.90 so hard-motion tails (e.g. unreachable backward-crouch
   # samples that fail 100%) do not hang forever at 97-99% with no zarr written.
   stall_progress_threshold: 0.90  # fraction of target_episodes
-  stall_timeout_seconds: 120      # seconds of no progress before exit
+  stall_timeout_seconds: 1800     # seconds of no progress before exit
 
 # Action noise injection (following BeyondMimic)
 # OU noise creates temporally correlated perturbations for better state diversity
