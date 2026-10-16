@@ -1,0 +1,17 @@
+# Data Collection Config - No Noise Version
+# Use this for collecting deterministic data without noise injection
+
+defaults:
+  - data_collection
+  - _self_
+
+# Override noise settings to disable
+noise:
+  enable: false
+  
+# You can adjust other settings as needed
+collection:
+  len_to_save: 1000000  # Collect less data for quick tests
+  
+task:
+  num_envs: 512  # Fewer envs for faster iteration

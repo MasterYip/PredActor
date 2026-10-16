@@ -64,7 +64,7 @@ env_runner:
       clip_model_name: "ViT-B/32" # Fallback when checkpoint_path is null
       clip_training: ""           # "" = frozen; "text" = fine-tune text encoder
       clip_layers: 12             # Number of Transformer layers in CLIP
-      checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT}"
+      checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT,./Artifacts/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar}"
                                   # Complete CLIP state (null = load clip_model_name)
 
     # CLIP interpolation — semantic blending GUI with slider controls
@@ -76,7 +76,7 @@ env_runner:
       clip_model_name: "ViT-B/32" # CLIP model variant
       clip_training: ""           # "" = frozen
       clip_layers: 12             # Number of Transformer layers in CLIP
-      checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT}"
+      checkpoint_path: "${oc.env:PREDACTOR_TEXT_CHECKPOINT,./Artifacts/checkpoints/motionclip/g1-model-xyz-clip/checkpoint_0100.pth.tar}"
       normalize: true             # Normalise final embedding to unit norm
       text_pairs:                 # Pairs of text prompts for each interpolation slider
         - [null, "stand"]

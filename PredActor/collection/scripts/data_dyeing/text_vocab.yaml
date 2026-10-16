@@ -1,0 +1,181 @@
+# Vocabulary for Text Alignment in Data Dyeing
+vocabulary_categories:
+  Walking:
+    - Walk
+    - Walking
+    - Walk forward
+    - Walking forward
+    - Walk back and forth
+    - Walking backwards
+    - Walk in circle
+    - Walking in a circle
+    - Walk around
+    - Taking a walk
+    - Power walking
+    - walks forward
+    - walks backward
+    - walks to the left
+    - walks to the right
+    - walking slowly
+    - walking fast
+    - walks in a circle
+    - walks and turns around
+    - walks forward while curving
+    - power walking
+
+  Running:
+    - running
+    - Running
+    - run
+    - run in place
+    - running in place
+    - Running on treadmill
+    - run forward
+    - running forward
+    
+  Jumping:
+    - Jump
+    - Jumping
+    - 360 degree left jump and standing and turning back
+    - 270 degree left jump and standing and turning back
+    - 210 degree left jump and turning back
+    
+  Climbing:
+    - Climbing
+    - Climb stairs
+    - Walking up stairs
+    - Walking upstairs.
+    - Walk up stairs
+    - Go down the stairs
+    - Walk down stairs
+    - Walking down steps
+    
+  Running:
+    - runs forward
+    - running fast
+    - jogging
+    - runs in place
+    - sprints forward
+    - runs backward
+    - runs in circles
+    - running on a treadmill
+    
+  Jumping:
+    - jumps up
+    - jumps forward
+    - jumping jack
+    - hops on one leg
+    - vertical jump
+    - jumps backward
+    - 360 degree jump
+    - high jump
+    
+  Dancing:
+    - dancing
+    - dances to music
+    - dance move
+    - breakdancing
+    - ballet dancing
+    - dances freely
+    
+  Climbing:
+    - climbs stairs
+    - walks up stairs
+    - walks upstairs
+    - climbs up
+    - goes down the stairs
+    - walks down stairs
+    - descends steps
+    
+  Kicking:
+    - kicks forward
+    - kicks a ball
+    - high kick
+    - kicks to the side
+    - kicks backward
+    - does martial arts kicks
+    - roundhouse kick
+    
+  Throwing:
+    - throws a ball
+    - throws something
+    - throws forward
+    - tosses an object
+    - throws with right hand
+    - pitches a ball
+    
+  Hand_Movements:
+    - waves their hand
+    - raises their arms
+    - claps their hands
+    - reaches up high
+    - stretches their arms
+    - crosses their arms
+    - puts hand on head
+    - gestures with hands
+    
+  Standing_Balancing:
+    - stands still
+    - balancing
+    - stands up
+    - maintains balance
+    - stands in place
+    
+  Squatting_Bending:
+    - squats down
+    - bends over
+    - bows
+    - crouches down
+    - bends forward
+    - squat
+    
+  Stepping:
+    - steps forward
+    - steps backward
+    - takes a step
+    - steps to the side
+    - steps over something
+    
+  Sports_Activities:
+    - swings a golf club
+    - plays violin
+    - plays the flute
+    - rides a bike
+    - golf swing
+    - plays a sport
+    
+  Stretching:
+    - stretches
+    - stretches their arms
+    - stretches their legs
+    - does stretching exercises
+    
+  Stomping:
+    - stomps their foot
+    - stomps on the ground
+    - stomps forward
+    
+  Arm_Movements:
+    - moves their right arm up and down
+    - raises both arms
+    - swings their arms
+    - extends their arms
+    - moves arms in circles
+    
+  Sitting:
+    - sits down
+    - sits on a chair
+    - sits on the ground
+    - sits cross-legged
+    - sits and stands
+    - sitting
+    
+  Other_Actions:
+    - wipes something down
+    - stirs something
+    - touches an object
+    - moves an item
+    - walks while drunk
+    - walks on tiptoe
+    - shuffles sideways
+    - leans forward

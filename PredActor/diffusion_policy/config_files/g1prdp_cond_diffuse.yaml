@@ -17,7 +17,7 @@ defaults:
 
 exp_name: null
 output_dir: "./outputs/"
-dataset_dir: "unused-evaluation-only"
+dataset_dir: "${oc.env:PREDACTOR_DATASET_ROOT,./Artifacts/dataset/g1_152fk}"
 
 logging:
   group: null

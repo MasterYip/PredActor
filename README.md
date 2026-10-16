@@ -20,9 +20,8 @@
 </p>
 
 > [!IMPORTANT]
-> The evaluation code is available now, with browser-based MuJoCo evaluation
-> of the published PDP051 checkpoint. Training, data collection, and robot
-> deployment releases are coming soon.
+> Evaluation, data collection, MotionCLIP labeling, and BC training code are
+> available. DAgger and robot deployment releases are coming next.
 
 ## Quick evaluation
 
@@ -47,6 +46,73 @@ the training repositories are not required.
 For a headless startup, use `uv run --locked predactor-eval --headless
 --web-no-browser`. Run `uv run --locked predactor-eval --help` for optional
 checkpoint, config, device, and Web UI overrides.
+
+## Reproduce collection and training
+
+Download the default set of 152 G1 motion trajectories, RLTracker checkpoint,
+and G1 MotionCLIP checkpoint:
+
+```bash
+uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_152fk
+```
+
+```bash
+# IsaacLab collection environment
+conda create --override-channels -c conda-forge -n predactor-collection python=3.10 -y
+conda activate predactor-collection
+bash PredActor/collection/install.sh
+
+# Collect 7,600 episodes from the 152 motions
+bash PredActor/collection/collect_dataset.sh \
+  --mode deterministic --samples_per_motion 50 --num_envs 1000 --headless
+
+# Return to the repository uv environment, dye the collected trajectories, then train
+conda deactivate
+uv run python PredActor/collection/scripts/data_dyeing/data_dyeing.py
+
+# Train the text-conditioned policy
+uv run python PredActor/train.py \
+  --cfg g1prdp_cond_diffuse.yaml --exp_name predactor_bc \
+  dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \
+  dataset.zarr_path=motion_dyed_text_t0.01.zarr \
+  training.num_epochs=50 training.seed=42 dataloader.num_workers=16 \
+  logging.mode=offline
+```
+
+To train the condition-free PRDP baseline on the same collected/dyed zarr:
+
+```bash
+uv run python PredActor/train.py \
+  --cfg g1prdp_diffuse.yaml --exp_name predactor_bc_unconditional \
+  dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \
+  dataset.zarr_path=motion_dyed_text_t0.01.zarr \
+  training.seed=42 dataloader.num_workers=16 \
+  logging.mode=offline
+```
+
+`g1prdp_diffuse.yaml` does not use the text latent at inference; the same dyed
+zarr is used so both runs share the collection and dataset layout.
+
+Artifact placement and environment details are in the
+[collection](docs/data_collection.md),
+[data dyeing](docs/data_dyeing.md),
+[training](docs/training.md), and
+[motion encoder](docs/motion_encoder.md) guides.
+
+## Train the motion encoder
+
+Train G1 MotionCLIP with the original G1 xyz recipe: G1-retargeted AMASS motions,
+BABEL labels, and a trainable CLIP text encoder. Follow the
+[motion encoder guide](docs/motion_encoder.md) to prepare the training database,
+then run from the repository root:
+
+```bash
+uv run --locked bash PredActor/motion_encoder/scripts/train_g1_xyz.sh
+```
+
+This runs 100 epochs with 16 data-loader workers and writes
+`PredActor/motion_encoder/exps/g1-model-xyz-clip/checkpoint_0100.pth.tar`.
+It does not initialize from the released MotionCLIP checkpoint.
 
 ## Overview
 
@@ -75,8 +141,8 @@ For onboard execution, rolling denoising and computation-preserving runtime opti
 **Release checklist**
 
 - [x] **Evaluation:** browser-based MuJoCo evaluation, G1 assets, and published checkpoints.
-- [ ] **Data collection and labeling:** motion collection, preprocessing, and dataset labeling tools.
-- [ ] **BC training:** behavior-cloning training code, configurations, and reproducibility assets.
+- [x] **Data collection and labeling:** IsaacLab motion collection and MotionCLIP dataset labeling tools.
+- [x] **BC training:** behavior-cloning training code, configurations, and reproducibility smoke test.
 - [ ] **DAgger:** interactive data aggregation and policy refinement pipeline.
 - [ ] **Deployment:** onboard deployment and hardware-control tools.
 
