@@ -49,9 +49,8 @@ checkpoint, config, device, and Web UI overrides.
 
 ## Reproduce collection and training
 
-The public pipeline takes three external inputs: the 152 retargeted G1 motion
-trajectories, the released RLTracker teacher checkpoint, and the G1 MotionCLIP
-checkpoint. Download them from the artifact repository with:
+Download the 152 G1 motion trajectories, RLTracker checkpoint, and G1 MotionCLIP
+checkpoint:
 
 ```bash
 uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_152fk
@@ -63,15 +62,15 @@ conda create --override-channels -c conda-forge -n predactor-collection python=3
 conda activate predactor-collection
 bash PredActor/collection/install.sh
 
-# Collect the raw 152-motion dataset
+# Collect 7,600 episodes from the 152 motions
 bash PredActor/collection/collect_dataset.sh \
-  --mode deterministic --samples_per_motion 1 --num_envs 16 --headless
+  --mode deterministic --samples_per_motion 50 --num_envs 1000 --headless
 
 # Return to the repository uv environment, dye the collected trajectories, then train
 conda deactivate
 uv run python PredActor/collection/scripts/data_dyeing/data_dyeing.py
 
-# Paper-profile conditioned PRDP training
+# Train the text-conditioned policy
 uv run python PredActor/train.py \
   --cfg g1prdp_cond_diffuse.yaml --exp_name predactor_bc \
   dataset_dir="$PWD/Artifacts/dataset/g1_152fk" \

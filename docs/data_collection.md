@@ -15,9 +15,6 @@ Artifacts/
     └── ...
 ```
 
-The teacher checkpoint is a required learned artifact. It is not inferred from
-the motion files or MotionCLIP checkpoint.
-
 Download both inputs from the PredActor artifact repository:
 
 ```bash
@@ -54,28 +51,22 @@ IsaacLab checkout are reused.
 
 ## Collect
 
-Run the 152-motion deterministic collection from the public repository root:
+Run deterministic collection from the public repository root.
+Fifty accepted episodes for each of 152 motions produces 7,600 episodes:
 
 ```bash
 bash PredActor/collection/collect_dataset.sh \
   --mode deterministic \
-  --samples_per_motion 1 \
-  --num_envs 16 \
+  --samples_per_motion 50 \
+  --num_envs 1000 \
   --headless
 ```
 
-The wrapper resolves the motions and checkpoint from `Artifacts/` and writes
-`Artifacts/dataset/g1_152fk_raw/motion.zarr`. Command-line `--checkpoint`,
+The output is `Artifacts/dataset/g1_152fk_raw/motion.zarr`. Command-line `--checkpoint`,
 `--motion_file`, and `--output_dir` values override those defaults.
-
-The collection command is the first step of the normal reproduce flow. An
-optional layout check is available when debugging an installation:
-
-```bash
-python PredActor/collection/scripts/collection_preflight.py
-```
 
 Use `--visualize` for the native Isaac Sim viewer or `--headless --livestream
 2` for WebRTC. Run `bash PredActor/collection/collect_dataset.sh --help` for
-the complete collection and noise options. After collection, continue with
-the dyeing command in the next guide; no separate preflight step is required.
+the complete collection and noise options.
+
+Next, [label the collected data](data_dyeing.md), then [train PredActor](training.md).
