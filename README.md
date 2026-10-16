@@ -49,8 +49,8 @@ checkpoint, config, device, and Web UI overrides.
 
 ## Reproduce collection and training
 
-Download the 152 G1 motion trajectories, RLTracker checkpoint, and G1 MotionCLIP
-checkpoint:
+Download the default set of 152 G1 motion trajectories, RLTracker checkpoint,
+and G1 MotionCLIP checkpoint:
 
 ```bash
 uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_152fk

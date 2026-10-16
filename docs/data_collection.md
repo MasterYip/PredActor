@@ -5,7 +5,7 @@ state-action trajectories consumed by PredActor training.
 
 ## Inputs
 
-Place the 152 retargeted motions and teacher checkpoint at these paths:
+Place the supplied motion set and teacher checkpoint at these default paths:
 
 ```text
 Artifacts/
@@ -52,7 +52,7 @@ IsaacLab checkout are reused.
 ## Collect
 
 Run deterministic collection from the public repository root.
-Fifty accepted episodes for each of 152 motions produces 7,600 episodes:
+With the supplied 152 motions, 50 episodes per motion gives 7,600 episodes:
 
 ```bash
 bash PredActor/collection/collect_dataset.sh \
@@ -64,6 +64,11 @@ bash PredActor/collection/collect_dataset.sh \
 
 The output is `Artifacts/dataset/g1_152fk_raw/motion.zarr`. Command-line `--checkpoint`,
 `--motion_file`, and `--output_dir` values override those defaults.
+
+For another motion set, use `--motion_file "my_motions/*"` under
+`Artifacts/motions/`. The episode target is the number of matched motions
+times `--samples_per_motion`. Use the same pattern for `input.motion_pattern`
+when dyeing the dataset.
 
 Use `--visualize` for the native Isaac Sim viewer or `--headless --livestream
 2` for WebRTC. Run `bash PredActor/collection/collect_dataset.sh --help` for
