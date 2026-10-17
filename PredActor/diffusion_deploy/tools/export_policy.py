@@ -218,22 +218,21 @@ _DEPLOY_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def _default_urdf_path():
-    """Return an absolute path to a G1 URDF in the merged PegasusMoDye repo, or "".
+    """Return a bundled or merged-repo G1 URDF, or ``""`` when unavailable.
 
-    PDPlanner is a submodule of PegasusMoDye; the G1 URDF ships in RLTracker.
-    We walk up from diffusion_deploy/ looking for a sibling ``RLTracker``
-    (``../../RLTracker/...`` in the merged repo, ``../../../RLTracker/...`` in a
-    worktree under PegasusMoDye/worktrees/).  When no such repo layout is found
-    (standalone PDPlanner clone) we return "" so FK exports still require an
-    explicit --urdf-path.
+    The public PredActor export includes the asset under ``PredActor/assets``.
+    The development checkout keeps the same asset in RLTracker, so both layouts
+    are searched before requiring an explicit ``--urdf-path``.
     """
-    rel = (pathlib.Path("RLTracker") / "source" / "rl_tracker" / "rl_tracker"
-           / "assets" / "unitree_description" / "urdf" / "g1" / "main.urdf")
-    cur = _DEPLOY_ROOT.parent  # e.g. <repo>/PDPlanner  or <worktree-root>
+    public_rel = pathlib.Path("assets") / "unitree_description" / "urdf" / "g1" / "main.urdf"
+    dev_rel = (pathlib.Path("RLTracker") / "source" / "rl_tracker" / "rl_tracker"
+               / "assets" / "unitree_description" / "urdf" / "g1" / "main.urdf")
+    cur = _DEPLOY_ROOT.parent  # e.g. <repo>/PredActor or <repo>/PDPlanner
     for _ in range(5):
-        cand = cur / rel
-        if cand.is_file():
-            return str(cand)
+        for rel in (public_rel, dev_rel):
+            cand = cur / rel
+            if cand.is_file():
+                return str(cand)
         cur = cur.parent
     return ""
 
