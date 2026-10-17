@@ -24,6 +24,17 @@
 > available. The diffusion-deploy source and release runbooks are included;
 > deployed policy packages are supplied separately.
 
+## Overview
+
+PredActor augments action diffusion with an internal future-state trajectory
+for look-ahead guidance while retaining direct action execution. It supports
+classifier guidance on predicted states and classifier-free guidance for text
+commands, using only proprioceptive history at runtime.
+
+The repository is organized around five reader paths: quick evaluation, data
+collection, training, model evaluation, and deployment. The release checklist
+below shows what is currently available.
+
 ## Quick evaluation
 
 Install [uv](https://docs.astral.sh/uv/), then run these commands on Linux:
@@ -47,21 +58,6 @@ the training repositories are not required.
 For a headless startup, use `uv run --locked predactor-eval --headless
 --web-no-browser`. Run `uv run --locked predactor-eval --help` for optional
 checkpoint, config, device, and Web UI overrides.
-
-## Deployment
-
-The `diffusion_deploy/` directory contains the C++ runtime, exporter, G1
-assets, platform lock, and launch scripts. The short release guide covers the
-paper-default policy export and the three supported paths:
-
-- [MuJoCo sim2sim](docs/deployment.md#a-mujoco-sim2sim)
-- [wired workstation to G1](docs/deployment.md#b-wired-workstation-deployment)
-- [onboard Jetson G1](docs/deployment.md#c-onboard-g1-deployment)
-
-The latest deployment reference is the Task165 PDP067 Standard2 full DDIM-2
-package. Its 605-D condition excludes `base_lin_vel`; the package and learned
-graph are external to this source repository and must be checked by SHA-256
-before installation.
 
 ## Reproduce collection and training
 
@@ -146,7 +142,28 @@ This runs 100 epochs with 16 data-loader workers and writes
 `PredActor/motion_encoder/exps/g1-model-xyz-clip/checkpoint_0100.pth.tar`.
 It does not initialize from the released MotionCLIP checkpoint.
 
-## Overview
+## Deployment
+
+The `PredActor/diffusion_deploy/` directory contains the C++ runtime, exporter,
+G1 assets, platform lock, and launch scripts. Read the
+[deployment quickstart](docs/deployment.md) for export, build, and the three
+routes: [MuJoCo sim2sim](docs/deployment.md#mujoco-sim2sim),
+[wired G1](docs/deployment.md#wired-g1), and
+[onboard G1](docs/deployment.md#onboard-g1).
+
+The paper defaults use G1, FP32, DDIM-2, and no FK for the PRDP policy. Exported
+policy bundles and learned weights are supplied separately.
+
+```bash
+cd PredActor/diffusion_deploy
+PYTHONNOUSERSITE=1 PYTHONPATH=.. python tools/export_policy.py \
+  --checkpoint /path/to/checkpoint.ckpt --config checkpoint \
+  --output models/my_policy --mode backbone --target native \
+  --obs-profile G1 --no-use-fk --deploy-config deploy_config.yaml --gui
+./build.sh --backend torch --download-runtime auto --with-sdk2 --jobs 4
+```
+
+## Paper context
 
 **PredActor** augments action diffusion with an internal future-state trajectory for look-ahead guidance while retaining direct action execution. Within a joint state-action formulation, it predicts future states and actions from proprioceptive history and optional task context. Unlike a generator-tracker pipeline, predicted states remain inside the policy rather than becoming motion references for a separate tracker. Unlike action-only diffusion, the policy provides an explicit future-state trajectory for guidance.
 
@@ -154,13 +171,16 @@ This representation supports two complementary steering mechanisms: **classifier
 
 For onboard execution, rolling denoising and computation-preserving runtime optimizations support **50 Hz control on a Unitree G1's Jetson Orin NX**. The measured complete callback takes **16.790 ms median and 19.383 ms p95**, both below the 20 ms control period. Across simulation and physical-robot evaluation, demonstrations cover text commands, disturbance response, joystick steering, and semantic interpolation.
 
-## Project preview
+<details>
+<summary>Project preview</summary>
 
 <p align="center">
   <a href="https://masteryip.github.io/predactor.github.io/">
     <img src="./docs/assets/predactor-preview.png" width="100%" alt="PredActor humanoid control project preview">
   </a>
 </p>
+
+</details>
 
 ### At a glance
 

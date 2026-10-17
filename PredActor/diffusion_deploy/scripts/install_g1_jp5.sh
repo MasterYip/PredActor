@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_ROOT="$(dirname "${SCRIPT_DIR}")"
 LOCK="${SOURCE_ROOT}/deps/platform-lock.json"
 PROFILE="jetson-jp5"
-BASE="${HOME}/CodeSpace/HoffMan"
+BASE="${HOME}/CodeSpace/PredActor"
 PREFIX=""
 CACHE=""
 BUILD_DIR=""
@@ -24,7 +24,7 @@ Usage:
   ./scripts/install_g1_jp5.sh --model-dir PATH [options]
 
 Options:
-  --base PATH          User-owned root (default: ~/CodeSpace/HoffMan)
+  --base PATH          User-owned root (default: ~/CodeSpace/PredActor)
   --model-dir PATH     Exported model resource directory to verify and install
   --model-name NAME    Stable model label (default: policy)
   --artifact-dir PATH  Seed cache from pinned wheel/source archives in PATH

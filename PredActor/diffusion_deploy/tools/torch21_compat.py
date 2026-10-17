@@ -116,7 +116,7 @@ class Torch21ConditionEmbeddingBackbone(nn.Module):
     """Stateless exact-weight wrapper that exposes per-call condition reuse.
 
     C++ builds the encoded condition once at the policy boundary, then supplies
-    it to all five DDIM backbone evaluations.  Unlike the Task073 projected-K/V
+    it to all five DDIM backbone evaluations. Unlike the projected-K/V
     cache, this keeps the native decoder graph and has no cross-call identity or
     tensor-version bookkeeping.
     """

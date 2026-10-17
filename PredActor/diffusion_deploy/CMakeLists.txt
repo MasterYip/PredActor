@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 project(diffusion_deploy CXX)
 
 include(GNUInstallDirs)
-include(CTest)
+option(BUILD_TESTING "Build deployment tests" OFF)
+if(BUILD_TESTING)
+    include(CTest)
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,9 +54,9 @@ option(USE_TORCH         "Build with LibTorch backend"       OFF)
 option(USE_ONNX          "Build with ONNXRuntime backend"    OFF)
 option(USE_UNITREE_SDK2  "Enable Unitree SDK2 DDS channels"  OFF)
 option(USE_FK            "Build with Pinocchio FK"           OFF)
-option(BUILD_TOOLS       "Build debug and benchmark tools"   ON)
-option(BUILD_DDIM5_OPT_TOOLS "Build Task082 DDIM5 profiling tools" OFF)
-option(BUILD_EDGE_PREFLIGHT "Build read-only edge diagnostics" ON)
+option(BUILD_TOOLS       "Build debug and benchmark tools"   OFF)
+option(BUILD_DDIM5_OPT_TOOLS "Build DDIM5 profiling tools" OFF)
+option(BUILD_EDGE_PREFLIGHT "Build read-only edge diagnostics" OFF)
 option(EDGE_MINIMAL      "Build the minimal headless edge surface" OFF)
 option(ENABLE_UNITREE_COMMAND_PUBLISH "Enable robot command publishing" OFF)
 
@@ -234,7 +237,7 @@ if(USE_TORCH OR USE_ONNX)
         target_link_libraries(inspect_edge_deploy diffusion_deploy)
         add_executable(benchmark_g1_feedback tools/benchmark_g1_feedback.cpp)
         target_link_libraries(benchmark_g1_feedback diffusion_deploy)
-        # The Task142 benchmark has a compile-time no-publish guard.  Keep it
+        # The benchmark has a compile-time no-publish guard. Keep it
         # out of control-capable builds while retaining it in validation builds.
         if(NOT ENABLE_UNITREE_COMMAND_PUBLISH)
             add_executable(benchmark_task142_orin tools/benchmark_task142_orin.cpp)
@@ -363,9 +366,9 @@ if(BUILD_TESTING)
     add_test(NAME task164_session_materializer
         COMMAND ${Python3_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test/test_task164_session_materializer.py)
-    add_test(NAME task165_wbg_contract
+    add_test(NAME wbg_contract
         COMMAND ${Python3_EXECUTABLE}
-                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_task165_wbg_contract.py)
+                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_wbg_contract.py)
     add_test(NAME g1_urdf_resource
         COMMAND ${Python3_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test/test_g1_urdf_resource.py)
@@ -406,8 +409,10 @@ install(FILES config/g1_edge_minimal.yaml config/fsm_unitree_remote.yaml
 install(FILES resources/g1/main.urdf resources/g1/PROVENANCE.md
     resources/g1/LICENSE resources/g1/SOURCE_PACKAGE.xml
     DESTINATION ${CMAKE_INSTALL_DATADIR}/diffusion_deploy/resources/g1)
-install(FILES doc/EDGE_DEPLOYMENT.md
+install(FILES doc/PREDATOR_DEPLOYMENT.md
+    doc/POLICY_EXPORT_AND_CONFIG.md doc/WORKSTATION_BUILD.md
     DESTINATION ${CMAKE_INSTALL_DATADIR}/diffusion_deploy/doc)
+install(FILES doc/G1OnboardDeployDoc/PUBLIC_ONBOARD.md
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/diffusion_deploy/doc/G1OnboardDeployDoc)
 install(PROGRAMS scripts/create_edge_bundle.sh scripts/verify_model_resources.sh
-    tools/rebase_model_resources.py
     DESTINATION ${CMAKE_INSTALL_DATADIR}/diffusion_deploy/scripts)

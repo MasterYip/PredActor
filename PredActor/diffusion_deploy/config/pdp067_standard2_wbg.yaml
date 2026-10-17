@@ -1,4 +1,4 @@
-# Task165 full Standard2 WBG contract. The only body-set delta from the
+# Standard2 full WBG contract. The only body-set delta from the
 # historical Standard2 unified profile is vx: pelvis only (body 0).
 enabled: true
 profile: g1_standard

@@ -137,7 +137,7 @@ fi
 
 if [[ -n "${JETSON_LOCKED_PROFILE}" ]]; then
   LOCK="${PROJECT_ROOT}/deps/platform-lock.json"
-  DEPLOY_BASE="${DIFFUSION_DEPLOY_BASE:-${HOME}/CodeSpace/HoffMan}"
+  DEPLOY_BASE="${DIFFUSION_DEPLOY_BASE:-${HOME}/CodeSpace/PredActor}"
   DEPLOY_PREFIX="${DIFFUSION_DEPLOY_PREFIX:-${DEPLOY_BASE}/install/diffusion-deploy}"
   DEPLOY_CACHE="${DIFFUSION_DEPLOY_CACHE:-${DEPLOY_BASE}/cache}"
   export PYTHONPATH="${PROJECT_ROOT}/python${PYTHONPATH:+:${PYTHONPATH}}"

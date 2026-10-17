@@ -242,7 +242,7 @@ def _derive_deploy_args(actor_type, obs_dim, obs_profile, use_fk, urdf_path):
     """Resolve obs_profile / use_fk / urdf_path when the user did not pass them.
 
     Derivation rules (documented in the README):
-      * actor_type == "prdp"      → obs_profile "G1", use_fk true (192-D body + FK)
+      * actor_type == "prdp"      → obs_profile "G1", use_fk false (paper PRDP contract)
       * obs_dim == 96             → "G1_RLObs", no FK
       * obs_dim == 192            → "G1", FK
       * anything else             → genuinely ambiguous → require --obs-profile
@@ -265,7 +265,7 @@ def _derive_deploy_args(actor_type, obs_dim, obs_profile, use_fk, urdf_path):
 
     if use_fk is None:
         if actor_type == "prdp":
-            use_fk = True
+            use_fk = False
         elif obs_profile == "G1":
             use_fk = True
         elif obs_profile == "G1_RLObs":
@@ -424,7 +424,7 @@ def compute_ddpm_schedule(denoising_steps):
 def _enable_scalar_ddim(actor_cfg):
     """Return a deterministic scalar-DDIM export override.
 
-    Task082's condition-embedding and fixed-plan reuse require scalar DDIM.
+    Condition-embedding and fixed-plan reuse require scalar DDIM.
     The override is explicit so old exporter invocations continue to preserve
     the checkpoint sampler unchanged.
     """
@@ -1128,7 +1128,7 @@ def _write_deploy_config(output_dir, actor_cfg, norm_stats, backbone_path, sched
               help="Run the C++ actor under c10::InferenceMode in addition to no-grad")
 @click.option("--scalar-ddim", is_flag=True, default=False,
               help="Explicitly export deterministic scalar DDIM instead of the "
-                   "checkpoint's ns/rolling schedule; required by Task082 "
+                   "checkpoint's ns/rolling schedule; required by fixed-plan "
                    "condition-reuse and DDIM-plan optimizations")
 @click.option("--ddim-steps", type=click.IntRange(min=1), default=None,
               help="Override policy.actor.ddim_steps before reconstructing the "
@@ -1147,7 +1147,7 @@ def _write_deploy_config(output_dir, actor_cfg, norm_stats, backbone_path, sched
                    "Default: repo-relative RLTracker G1 URDF when found, else empty.")
 @click.option("--use-fk/--no-use-fk", default=None,
               help="Enable or disable FK in the generated deploy config. Default: "
-                   "derived (G1/prdp→true, G1_RLObs→false).")
+                   "derived (paper prdp→false, G1_RLObs→false; other G1 profiles→true).")
 @click.option("--write-actor-config", is_flag=True, default=False,
               help="Debug: also dump actor_config.yaml (root key `actor:`). The C++ "
                    "runtime does NOT read this file; the deploy config is the single "
