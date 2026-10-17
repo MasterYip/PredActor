@@ -35,8 +35,8 @@ Check the bundle before launching:
 
 ```bash
 PredActor/diffusion_deploy/scripts/verify_model_resources.sh \
-  --resource-dir Artifacts/deploy/my_policy --require-text
-(cd Artifacts/deploy/my_policy && sha256sum -c SHA256SUMS)
+  --resource-dir Artifacts/deploy/pdp067_standard2_full_jp5_ddim2 --require-text
+(cd Artifacts/deploy/pdp067_standard2_full_jp5_ddim2 && sha256sum -c SHA256SUMS)
 ```
 
 ## 2. Build the runtime
@@ -64,8 +64,8 @@ policy in a second terminal and keep the network interface set to `lo`:
 
 ```bash
 PredActor/diffusion_deploy/scripts/run.sh \
-  --config Artifacts/deploy/my_policy/deploy_config.yaml \
-  --fsm-config Artifacts/deploy/my_policy/fsm_config.yaml \
+  --config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/deploy_config.yaml \
+  --fsm-config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/fsm_config.yaml \
   --device cuda:0 --mode control --unified-command \
   --command-source joydev --command-device /dev/input/js0 \
   --command-mapping xbox_new
@@ -83,8 +83,8 @@ run the controller from the repository root:
 ```bash
 ip -br addr
 PredActor/diffusion_deploy/scripts/run.sh \
-  --config Artifacts/deploy/my_policy/deploy_config.yaml \
-  --fsm-config Artifacts/deploy/my_policy/fsm_config.yaml \
+  --config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/deploy_config.yaml \
+  --fsm-config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/fsm_config.yaml \
   --device cuda:0 --mode control --unified-command \
   --command-source unitree_lowstate --build-dir PredActor/diffusion_deploy/build
 ```
@@ -94,7 +94,7 @@ only one controller is connected. Use the read-only configuration check first:
 
 ```bash
 PredActor/diffusion_deploy/scripts/run.sh \
-  --config Artifacts/deploy/my_policy/deploy_config.yaml \
+  --config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/deploy_config.yaml \
   --mode offline --validate-config --device cuda:0
 ```
 

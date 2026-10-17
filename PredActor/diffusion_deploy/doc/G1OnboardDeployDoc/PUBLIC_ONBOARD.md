@@ -14,8 +14,8 @@ training checkpoint in place of an exported resource bundle.
 ```bash
 rsync -a --delete PredActor/diffusion_deploy/ \
   <user>@<robot-host>:~/CodeSpace/PredActor/PredActor/diffusion_deploy/
-rsync -a --delete Artifacts/deploy/my_policy/ \
-  <user>@<robot-host>:~/CodeSpace/PredActor/Artifacts/deploy/my_policy/
+rsync -a --delete Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/ \
+  <user>@<robot-host>:~/CodeSpace/PredActor/Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/
 ```
 
 ## 2. JP5 Orin
@@ -26,7 +26,8 @@ wrong CPU/JetPack tuple and never calls `sudo` or edits system directories:
 ```bash
 ssh <user>@<robot-host>
 cd ~/CodeSpace/PredActor/PredActor/diffusion_deploy
-./scripts/install_g1_jp5.sh --model-dir ~/CodeSpace/PredActor/Artifacts/deploy/my_policy
+./scripts/install_g1_jp5.sh \
+  --model-dir ~/CodeSpace/PredActor/Artifacts/deploy/pdp067_standard2_full_jp5_ddim2
 ```
 
 For a disconnected robot, seed the installer cache on the host and add
@@ -55,10 +56,10 @@ Verify the package before starting any process that opens DDS:
 
 ```bash
 ./scripts/verify_model_resources.sh \
-  --resource-dir ~/CodeSpace/PredActor/Artifacts/deploy/my_policy --require-text
-(cd ~/CodeSpace/PredActor/Artifacts/deploy/my_policy && sha256sum -c SHA256SUMS)
+  --resource-dir ~/CodeSpace/PredActor/Artifacts/deploy/pdp067_standard2_full_jp5_ddim2 --require-text
+(cd ~/CodeSpace/PredActor/Artifacts/deploy/pdp067_standard2_full_jp5_ddim2 && sha256sum -c SHA256SUMS)
 ~/CodeSpace/build-nopublish/run_g1_robot \
-  --config ~/CodeSpace/PredActor/Artifacts/deploy/my_policy/deploy_config.yaml \
+  --config ~/CodeSpace/PredActor/Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/deploy_config.yaml \
   --mode offline --validate-config --device cuda:0
 ```
 
