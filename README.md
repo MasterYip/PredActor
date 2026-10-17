@@ -76,6 +76,28 @@ cd PredActor/diffusion_deploy
   --with-command-publish --jobs 4
 ```
 
+Launch the released bundle with one of these routes:
+
+```bash
+# Unitree MuJoCo (set env.network_interface: lo)
+PredActor/diffusion_deploy/scripts/run.sh \
+  --config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/deploy_config.yaml \
+  --fsm-config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/fsm_config.yaml \
+  --device cuda:0 --mode control --unified-command --command-source joydev
+
+# Wired G1 (set env.network_interface to the Unitree Ethernet interface)
+PredActor/diffusion_deploy/scripts/run.sh \
+  --config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/deploy_config.yaml \
+  --fsm-config Artifacts/deploy/pdp067_standard2_full_jp5_ddim2/fsm_config.yaml \
+  --device cuda:0 --mode control --unified-command \
+  --command-source unitree_lowstate
+
+# Onboard G1: copy the bundle, then run the installer on the Jetson
+cd PredActor/diffusion_deploy
+./scripts/install_g1_jp5.sh \
+  --model-dir ../Artifacts/deploy/pdp067_standard2_full_jp5_ddim2
+```
+
 The released deployment checkpoint is distributed from
 [MasterYip/PredActor_Artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts).
 Download the artifact before exporting or launching a policy; checkpoints are
