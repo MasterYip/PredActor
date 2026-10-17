@@ -12,8 +12,10 @@ the externally supplied exported model directory to the robot. Do not copy a
 training checkpoint in place of an exported resource bundle.
 
 ```bash
-rsync -a --delete diffusion_deploy/ <user>@<robot-host>:~/CodeSpace/PegasusMoDye/diffusion_deploy/
-rsync -a --delete models/my_policy/ <user>@<robot-host>:~/CodeSpace/models/my_policy/
+rsync -a --delete PredActor/diffusion_deploy/ \
+  <user>@<robot-host>:~/CodeSpace/PredActor/PredActor/diffusion_deploy/
+rsync -a --delete Artifacts/deploy/my_policy/ \
+  <user>@<robot-host>:~/CodeSpace/PredActor/Artifacts/deploy/my_policy/
 ```
 
 ## 2. JP5 Orin
@@ -23,8 +25,8 @@ wrong CPU/JetPack tuple and never calls `sudo` or edits system directories:
 
 ```bash
 ssh <user>@<robot-host>
-cd ~/CodeSpace/PegasusMoDye/diffusion_deploy
-./scripts/install_g1_jp5.sh --model-dir ~/CodeSpace/models/my_policy
+cd ~/CodeSpace/PredActor/PredActor/diffusion_deploy
+./scripts/install_g1_jp5.sh --model-dir ~/CodeSpace/PredActor/Artifacts/deploy/my_policy
 ```
 
 For a disconnected robot, seed the installer cache on the host and add
@@ -37,7 +39,7 @@ tree. The manager installs dependencies below `~/CodeSpace` and the build is
 publisher-disabled until an operator explicitly enables the control build:
 
 ```bash
-cd ~/CodeSpace/PegasusMoDye/diffusion_deploy
+cd ~/CodeSpace/PredActor/PredActor/diffusion_deploy
 export PYTHONPATH="$PWD/python${PYTHONPATH:+:$PYTHONPATH}"
 python3 -m diffusion_deploy_manager.cli --lock deps/platform-lock.json doctor --profile jetson-jp6
 ./build.sh --backend torch --download-runtime auto --with-sdk2 --with-fk --build-dir ~/CodeSpace/build-nopublish --jobs 2
@@ -52,10 +54,11 @@ resolve the platform mismatch instead of forcing a near match.
 Verify the package before starting any process that opens DDS:
 
 ```bash
-./scripts/verify_model_resources.sh --resource-dir ~/CodeSpace/models/my_policy --require-text
-(cd ~/CodeSpace/models/my_policy && sha256sum -c SHA256SUMS)
+./scripts/verify_model_resources.sh \
+  --resource-dir ~/CodeSpace/PredActor/Artifacts/deploy/my_policy --require-text
+(cd ~/CodeSpace/PredActor/Artifacts/deploy/my_policy && sha256sum -c SHA256SUMS)
 ~/CodeSpace/build-nopublish/run_g1_robot \
-  --config ~/CodeSpace/models/my_policy/deploy_config.yaml \
+  --config ~/CodeSpace/PredActor/Artifacts/deploy/my_policy/deploy_config.yaml \
   --mode offline --validate-config --device cuda:0
 ```
 
@@ -70,4 +73,5 @@ the control build, an on-site operator confirms the correct G1 Ethernet
 interface, E-stop, passive/ready/running FSM transitions, one controller, and
 the exact policy/package hashes. Do not run the control command during
 installation, from an unattended SSH session, or while another controller is
-active. The launch form is documented in `../PREDATOR_DEPLOYMENT.md`.
+active. The launch form is documented in the repository
+[`docs/deployment.md`](../../../../docs/deployment.md).

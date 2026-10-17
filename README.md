@@ -50,18 +50,43 @@ checkpoint, config, device, and Web UI overrides.
 
 ## Deployment
 
-The `diffusion_deploy/` directory contains the C++ runtime, exporter, G1
-assets, platform lock, and launch scripts. The short release guide covers the
-paper-default policy export and the three supported paths:
+The C++ runtime, exporter, G1 assets, and launch scripts are in
+`PredActor/diffusion_deploy/`. The [deployment guide](docs/deployment.md)
+starts with the paper deployment profile and gives the three supported paths:
 
-- [MuJoCo sim2sim](docs/deployment.md#a-mujoco-sim2sim)
-- [wired workstation to G1](docs/deployment.md#b-wired-workstation-deployment)
-- [onboard Jetson G1](docs/deployment.md#c-onboard-g1-deployment)
+- MuJoCo sim2sim
+- a wired workstation connected to a G1
+- onboard execution on a Jetson G1
 
-The latest deployment reference is the Task165 PDP067 Standard2 full DDIM-2
-package. Its 605-D condition excludes `base_lin_vel`; the package and learned
-graph are external to this source repository and must be checked by SHA-256
-before installation.
+Export a trained checkpoint with the default paper profile:
+
+```bash
+uv run --locked python PredActor/diffusion_deploy/tools/export_policy.py \
+  --checkpoint /absolute/path/to/latest.ckpt \
+  --config checkpoint \
+  --output /absolute/path/to/models/predactor \
+  --mode backbone --target native --obs-profile G1 --use-fk
+```
+
+Build the runtime with:
+
+```bash
+cd PredActor/diffusion_deploy
+./build.sh --backend torch --download-runtime auto --with-sdk2 --with-fk \
+  --with-command-publish --jobs 4
+```
+
+The released deployment checkpoint is distributed from
+[MasterYip/PredActor_Artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts).
+Download the artifact before exporting or launching a policy; checkpoints are
+kept out of the source tree.
+
+To fetch the latest deployment bundle directly:
+
+```bash
+uv run --locked python scripts/hf_download.py \
+  --filter checkpoints/deployment
+```
 
 ## Reproduce collection and training
 

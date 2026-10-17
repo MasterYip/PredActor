@@ -79,6 +79,12 @@ entries:
         size_bytes: 87408687
         sha256: 0043c99ca89b1e45e49be7fdc95dec261ab9df9a6dfeaf11cca739390421aa52
 
+  - hf_path: checkpoints/deployment/pdp067_standard2_full_jp5_ddim2
+    local_path: Artifacts/deploy/pdp067_standard2_full_jp5_ddim2
+    kind: directory
+    enabled: true
+    notes: Latest released G1 deployment bundle for MuJoCo, wired, and onboard launch
+
   - hf_path: motions/g1_152fk
     local_path: Artifacts/motions/g1_152fk
     kind: directory
