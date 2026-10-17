@@ -95,7 +95,7 @@ PredActor/diffusion_deploy/scripts/run.sh \
 # Onboard G1: copy the bundle, then run the installer on the Jetson
 cd PredActor/diffusion_deploy
 ./scripts/install_g1_jp5.sh \
-  --model-dir ../Artifacts/deploy/pdp067_standard2_full_jp5_ddim2
+  --model-dir ../../Artifacts/deploy/pdp067_standard2_full_jp5_ddim2
 ```
 
 The released deployment checkpoint is distributed from
