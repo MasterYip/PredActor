@@ -27,6 +27,22 @@ uv run --locked python scripts/hf_download.py \
 Collection uses Python 3.10, Isaac Sim 4.5.0, and Isaac Lab 2.1.0 in a separate
 environment:
 
+The tested reference setup is:
+
+| Component | Version |
+| --- | --- |
+| Host | Ubuntu 24.04.4 LTS, x86_64 |
+| Python | 3.10 |
+| Isaac Sim | 4.5.0 |
+| Isaac Lab | 2.1.0 (commit `21f7136325136ca3f6ca4e0a8125edffe5c24f7e`) |
+| PyTorch | 2.5.1 + CUDA 12.1 |
+| NVIDIA driver | 580.x or newer |
+
+Isaac Sim 4.x uses Python 3.10. Its pip installation also requires a recent
+glibc (Ubuntu 22.04/24.04 is suitable); Ubuntu 20.04's default glibc is too
+old for this installation route. Use NVIDIA's binary or container install on
+Ubuntu 20.04 instead.
+
 ```bash
 conda create --override-channels -c conda-forge -n predactor-collection python=3.10 -y
 conda activate predactor-collection

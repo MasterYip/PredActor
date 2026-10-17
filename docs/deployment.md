@@ -41,6 +41,15 @@ PredActor/diffusion_deploy/scripts/verify_model_resources.sh \
 
 ## 2. Build the runtime
 
+Initialize the pinned deployment dependencies once after cloning:
+
+```bash
+PredActor/diffusion_deploy/scripts/init_deploy_deps.sh
+```
+
+This initializes the MuJoCo, Unitree MuJoCo, Unitree SDK2, CycloneDDS, and
+optional SDK2-Python submodules under `PredActor/diffusion_deploy/deps/`.
+
 Build once on the workstation that will run the controller:
 
 ```bash
@@ -58,7 +67,7 @@ Start Unitree MuJoCo in one terminal. From the deployment build, start the
 policy in a second terminal and keep the network interface set to `lo`:
 
 ```bash
-../../deps/deploy/unitree_mujoco/simulate/build/unitree_mujoco \
+PredActor/diffusion_deploy/deps/unitree_mujoco/simulate/build/unitree_mujoco \
   -r g1 -i 0 --camera-follow
 ```
 

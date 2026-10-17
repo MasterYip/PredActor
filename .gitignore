@@ -4,6 +4,7 @@
 Artifacts/
 eval_output/
 outputs/
+PredActor/diffusion_deploy/deps/.build/
 __pycache__/
 *.py[cod]
 *.egg-info/

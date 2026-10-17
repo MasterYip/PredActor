@@ -1,0 +1,15 @@
+[submodule "PredActor/diffusion_deploy/deps/unitree_mujoco"]
+	path = PredActor/diffusion_deploy/deps/unitree_mujoco
+	url = https://github.com/MasterYip/unitree_mujoco.git
+[submodule "PredActor/diffusion_deploy/deps/mujoco"]
+	path = PredActor/diffusion_deploy/deps/mujoco
+	url = https://github.com/google-deepmind/mujoco.git
+[submodule "PredActor/diffusion_deploy/deps/unitree_sdk2"]
+	path = PredActor/diffusion_deploy/deps/unitree_sdk2
+	url = https://github.com/unitreerobotics/unitree_sdk2.git
+[submodule "PredActor/diffusion_deploy/deps/cyclonedds"]
+	path = PredActor/diffusion_deploy/deps/cyclonedds
+	url = https://github.com/eclipse-cyclonedds/cyclonedds.git
+[submodule "PredActor/diffusion_deploy/deps/unitree_sdk2_python"]
+	path = PredActor/diffusion_deploy/deps/unitree_sdk2_python
+	url = https://github.com/unitreerobotics/unitree_sdk2_python.git

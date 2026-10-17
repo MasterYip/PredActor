@@ -36,6 +36,11 @@ uv run --locked python scripts/hf_download.py --filter checkpoints
 uv run --locked predactor-eval
 ```
 
+Deployment dependencies are optional for this quick evaluation path. Before
+building the C++ runtime, initialize them with
+`PredActor/diffusion_deploy/scripts/init_deploy_deps.sh` (or clone with
+`--recurse-submodules`).
+
 The download command retrieves the released checkpoints from
 [MasterYip/PredActor_Artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts).
 
@@ -121,6 +126,8 @@ uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_15
 
 ```bash
 # IsaacLab collection environment
+# Tested reference: Ubuntu 24.04.4 x86_64, Python 3.10, Isaac Sim 4.5.0,
+# IsaacLab 2.1.0, PyTorch 2.5.1 + CUDA 12.1, NVIDIA driver 580.x+.
 conda create --override-channels -c conda-forge -n predactor-collection python=3.10 -y
 conda activate predactor-collection
 bash PredActor/collection/install.sh
