@@ -124,10 +124,14 @@ and G1 MotionCLIP checkpoint:
 uv run --locked python scripts/hf_download.py --filter checkpoints motions/g1_152fk
 ```
 
+The collection profile was tested on Ubuntu 24.04.4 (x86_64) with Python 3.10,
+Isaac Sim 4.5.0, IsaacLab 2.1.0, PyTorch 2.5.1 + CUDA 12.1, and an NVIDIA
+driver in the 580.x series or newer. Isaac Sim 4.x requires Python 3.10; its
+pip installation needs a recent glibc, so use Ubuntu 22.04/24.04 for this
+route. Ubuntu 20.04 should use NVIDIA's binary or container installation.
+
 ```bash
 # IsaacLab collection environment
-# Tested reference: Ubuntu 24.04.4 x86_64, Python 3.10, Isaac Sim 4.5.0,
-# IsaacLab 2.1.0, PyTorch 2.5.1 + CUDA 12.1, NVIDIA driver 580.x+.
 conda create --override-channels -c conda-forge -n predactor-collection python=3.10 -y
 conda activate predactor-collection
 bash PredActor/collection/install.sh
