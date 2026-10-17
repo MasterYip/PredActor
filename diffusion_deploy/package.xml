@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>diffusion_deploy</name>
+  <version>0.1.0</version>
+  <description>
+    C++ diffusion policy deployment library for Unitree G1 robot.
+    Mirrors the Python diffusion_policy package: UnitreeEnv, ObsComposer,
+    DiffusionAgent, TorchActor/OnnxActor, and EnvRunner.
+    ROS2-style package structure, ROS-independent at runtime.
+  </description>
+  <maintainer email="dev@example.com">Diffusion Deploy Team</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <!-- Runtime dependencies (system packages) -->
+  <exec_depend>yaml-cpp</exec_depend>
+  <exec_depend>libeigen3-dev</exec_depend>
+
+  <!-- Optional: uncomment if using in a ROS2 workspace -->
+  <!-- <build_depend>ament_cmake</build_depend> -->
+</package>

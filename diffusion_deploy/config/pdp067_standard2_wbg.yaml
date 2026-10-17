@@ -1,0 +1,34 @@
+# Standard2 full WBG contract. The only body-set delta from the
+# historical Standard2 unified profile is vx: pelvis only (body 0).
+enabled: true
+profile: g1_standard
+guidance_mode: classifier
+mode: simple
+enable_zeta_comp: false
+enable_damping_comp: false
+axis_gradient_impl: stacked
+guidances:
+  vx_guide:
+    enabled: true
+    kp: 1.0
+    command: 0.0
+    # Python WBG consumes named groups; C++ deploy consumes body_indices.
+    # Keep both representations equivalent so parity cannot silently fall
+    # back to Python's historical pelvis_torso default.
+    body_groups:
+      guided: [pelvis]
+    body_indices: [0]
+  vy_guide:
+    enabled: true
+    kp: 1.0
+    command: 0.0
+    body_groups:
+      guided: [torso]
+    body_indices: [0, 3, 4, 5, 6, 7, 8, 9]
+  wz_guide:
+    enabled: true
+    kp: 1.0
+    command: 0.0
+    body_groups:
+      guided: [torso]
+    body_indices: [0, 3, 4, 5, 6, 7, 8, 9]

@@ -1,0 +1,43 @@
+# G1 edge-minimal deployment template.
+# Replace REQUIRED_G1_ETHERNET_INTERFACE and copy the exported policy to
+# <bundle>/share/diffusion_deploy/models/policy.pt before preflight.
+model:
+  backend: torch
+  actor_type: torch
+  path: ../models/policy.pt
+  obs_dim: 96
+  action_dim: 29
+  cond_dim: 0
+  n_obs_steps: 4
+  n_future_steps: 16
+  denoising_steps: 100
+  obs_profile: G1_RLObs
+
+env:
+  execution_mode: offline  # offline | receive-only | no-publish | control
+  network_interface: REQUIRED_G1_ETHERNET_INTERFACE
+  control_dt: 0.02
+  state_timeout_s: 0.10
+  num_dof: 29
+  use_pr_mode: true
+  enable_safety_checks: true
+  release_mode_before_control: true
+  use_fk: false
+  urdf_path: ""
+  Kp: [60, 60, 60, 100, 40, 40, 60, 60, 60, 100, 40, 40, 60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40]
+  Kd: [1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+runner:
+  delay_action_step: 0.0
+  max_steps: 3000  # bounded 60 s first-run window at 50 Hz
+  realtime_mode: true
+  reset_height: 0.3
+  enable_cond_udp: false
+  enable_wbg_udp: false
+  condition_profile: external
+  text_cond_dim: 0
+
+normalization:
+  # The exporter must replace these identity fallbacks with checkpoint values.
+  obs: {mode: linear, min: [], max: []}
+  action: {mode: linear, min: [], max: []}

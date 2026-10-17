@@ -1,0 +1,66 @@
+# prdp_wbg_actor_config.yaml
+# ===========================
+# Whole-Body-Guidance actor config to pass to export_policy.py via --wbg-config.
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# export_policy.py serializes the C++ `model.whole_body_guidance` block ONLY when
+# the exported actor carries a `whole_body_guidance_config`. A checkpoint whose
+# embedded cfg has no such key (e.g. `g1prdp_diffuse` runs trained without WBG)
+# will silently produce a deploy config WITHOUT the block, so `run.sh --wbg-udp`
+# binds the receiver but the guidance no-ops at runtime.
+#
+# This file is the standalone `whole_body_guidance_config` dict consumed by
+# `--wbg-config`, so regeneration CAN produce a WBG-enabled deploy config from any
+# checkpoint (the C++ constructs WBG purely from the YAML block at runtime — the
+# checkpoint weights do not need WBG baked in).
+#
+# Regeneration example (from the PDPlanner submodule root):
+#   cd PDPlanner/diffusion_deploy
+#   python tools/export_policy.py \
+#     --checkpoint /abs/path/to/g1prdp_diffuse/latest.ckpt \
+#     --config checkpoint \
+#     --output models/prdp/ \
+#     --mode backbone --obs-profile G1 --use-fk \
+#     --urdf-path /abs/path/to/unitree_description/urdf/g1/main.urdf \
+#     --deploy-config deploy_config.yaml \
+#     --wbg-config config/prdp_wbg_actor_config.yaml
+#
+# Field reference (mirrors _wbg_deploy_block in tools/export_policy.py):
+#   enabled          - master switch; false omits the C++ block entirely
+#   guidance_mode    - "classifier" only (C++ rejects "pd")
+#   mode             - "simple" only (C++ rejects "integration")
+#   enable_zeta_comp - false uses legacy single-level zeta for DDIM jumps
+#   enable_damping_comp
+#                    - false uses legacy projected-gradient damping
+#   guidances.*_guide:
+#     enabled        - per-axis switch
+#     kp             - guidance gain
+#     command        - OPTIONAL default command (m/s for vx/vy, rad/s for wz);
+#                      live --wbg-default/--wbg-udp overrides this at runtime
+#     body_indices   - OPTIONAL numeric body indices in the 192-D G1 obs layout;
+#                      defaults to [0,9] when absent (C++ default: pelvis+torso).
+#                      Body b position xyz = obs[3b:3b+3], vel = obs[90+3b:90+3b+3].
+#
+# The deploy config that results needs env.use_fk=true and a real urdf_path
+# (WBG requires FK). sampler_mode rolling_ddpm / scalar_ddim / rolling_ddim all
+# support WBG.
+
+enabled: true
+profile: g1_standard
+guidance_mode: classifier
+mode: simple
+enable_zeta_comp: false
+enable_damping_comp: false
+guidances:
+  vx_guide:
+    enabled: true
+    kp: 0.1
+    command: 0.3
+    body_indices: [0, 9]
+  vy_guide:
+    enabled: false
+    kp: 0.1
+  wz_guide:
+    enabled: false
+    kp: 0.1
