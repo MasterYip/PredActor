@@ -137,12 +137,12 @@ endif()
 # Use --backend torch or --backend onnx for a full build.
 set(DIFFUSION_DEPLOY_SOURCES
     src/utils/math_utils.cpp
-    src/command/unified_command_interface.cpp
     src/safety/unitree_remote_adapter.cpp
 )
 
 if(USE_TORCH OR USE_ONNX)
     list(APPEND DIFFUSION_DEPLOY_SOURCES
+        src/command/unified_command_interface.cpp
         src/obs/obs_terms.cpp
         src/obs/obs_composer.cpp
         src/env/unitree_env.cpp
