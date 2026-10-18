@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "actor_format": {
+    "name": "torchscript-manual-sdpa-v1",
+    "producer_torch": "2.5.1+cu121",
+    "jetson_target_torch": "2.1.0a0+41361538.nv23.06",
+    "forbidden_operators": ["aten::scaled_dot_product_attention"],
+    "required_manifest_fields": ["producer_torch", "target_torch", "profile", "actor_sha256", "operator_sha256", "parity", "input_schema", "profile_resolution", "contract"]
+  },
+  "artifacts": {
+    "libtorch-linux-amd64-2.5.1-cpu": {
+      "kind": "zip",
+      "url": "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.5.1%2Bcpu.zip",
+      "filename": "libtorch-cxx11-abi-shared-with-deps-2.5.1+cpu.zip",
+      "sha256": "618ca54eef82a1dca46ff1993d5807d9c0deb0bae147da4974166a147cb562fa",
+      "size": 169621293,
+      "root": "libtorch"
+    },
+    "torch-jetson-jp5-2.1": {
+      "kind": "wheel",
+      "url": "https://developer.download.nvidia.com/compute/redist/jp/v512/pytorch/torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl",
+      "filename": "torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl",
+      "sha256": "5112e2ef5051f1003ae2ffb545ae596377df66979d62a954d774f18009064dbe",
+      "size": 170246840,
+      "root": "torch"
+    },
+    "torch-jetson-jp6-cu126-2.8.0": {
+      "kind": "wheel",
+      "url": "https://pypi.jetson-ai-lab.io/jp6/cu126/+f/62a/1beee9f2f1470/torch-2.8.0-cp310-cp310-linux_aarch64.whl",
+      "filename": "torch-2.8.0-cp310-cp310-linux_aarch64.whl",
+      "sha256": "62a1beee9f2f147076a974d2942c90060c12771c94740830327cae705b2595fc",
+      "size": 225979378,
+      "root": "torch"
+    },
+    "fmt-9.1.0": {
+      "kind": "tar.gz",
+      "url": "https://github.com/fmtlib/fmt/archive/refs/tags/9.1.0.tar.gz",
+      "filename": "fmt-9.1.0.tar.gz",
+      "sha256": "5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2",
+      "size": 837901,
+      "root": "fmt-9.1.0"
+    },
+    "spdlog-1.15.3": {
+      "kind": "tar.gz",
+      "url": "https://github.com/gabime/spdlog/archive/refs/tags/v1.15.3.tar.gz",
+      "filename": "spdlog-1.15.3.tar.gz",
+      "sha256": "15a04e69c222eb6c01094b5c7ff8a249b36bb22788d72519646fb85feb267e67",
+      "size": 277691,
+      "root": "spdlog-1.15.3"
+    },
+    "unitree-sdk2-f29ee9f": {
+      "kind": "tar.gz",
+      "url": "https://github.com/unitreerobotics/unitree_sdk2/archive/f29ee9f234851e9e79f75102c0f9e83008d8fdd1.tar.gz",
+      "filename": "unitree_sdk2-f29ee9f234851e9e79f75102c0f9e83008d8fdd1.tar.gz",
+      "sha256": "f6632a3eecef737641249f11213d8cb60d9dc7a8cc757b1959e5e708c8b777a1",
+      "size": 16501279,
+      "root": "unitree_sdk2-f29ee9f234851e9e79f75102c0f9e83008d8fdd1",
+      "skip_safe_symlinks": true
+    },
+    "pin-2.6.21-cp311-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/9a/78/2275b24ebad7a4858541272b85a2869b2d9b3e0bb109d99066e6f2b5f21e/pin-2.6.21-1-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "filename": "pin-2.6.21-1-cp311-cp311-manylinux_2_28_x86_64.whl", "sha256": "6c2cd3f8897e3f11a0327358b80cb4cf986b68ca45c06ce7cd39423899ae6fba", "size": 6121739, "root": "cmeel.prefix"
+    },
+    "pin-2.6.21-cp38-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/30/e2/87c8fff9efa9ac04b3a411fd675dfeb837421fb74dec919c7f7bc2695935/pin-2.6.21-1-cp38-cp38-manylinux_2_28_aarch64.whl",
+      "filename": "pin-2.6.21-1-cp38-cp38-manylinux_2_28_aarch64.whl", "sha256": "ca535e9a80ec44f138b5a28561f41675e302e009897e7dd54fcc05eda641ba50", "size": 6000101, "root": "cmeel.prefix"
+    },
+    "pin-2.6.21-cp310-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/fe/e1/3af6b3a941c8d0a760aa52379f2d2b5887b1d7356aa53d2eeb086b1f96cd/pin-2.6.21-1-cp310-cp310-manylinux_2_28_aarch64.whl",
+      "filename": "pin-2.6.21-1-cp310-cp310-manylinux_2_28_aarch64.whl", "sha256": "71d80895b415c7ca0b30e77499edef3d92d51b13a1a46c4f6808cc5e4baec337", "size": 6000149, "root": "cmeel.prefix"
+    },
+    "cmeel-boost-1.83.0-cp311-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/01/c9/bd04a1f5773dfe97993b4148cf48b5e61032cd3fa33f38a783ca15a3979e/cmeel_boost-1.83.0-0-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_boost-1.83.0-0-cp311-cp311-manylinux_2_28_x86_64.whl", "sha256": "85d46fff2093bb5fe1576918dbf69cc0c3f1f0f87028353687ffd8d0b3491f73", "size": 34709580, "root": "cmeel.prefix"
+    },
+    "cmeel-boost-1.83.0-cp38-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/3f/9f/981a05ef01153269f24ca47cac405da98de931e9492c4a57249465945763/cmeel_boost-1.83.0-0-cp38-cp38-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_boost-1.83.0-0-cp38-cp38-manylinux_2_28_aarch64.whl", "sha256": "2d45f421b8b80065e17087858ff66eabd2ece9e851d196a156924d4d7c3aadf1", "size": 34523991, "root": "cmeel.prefix"
+    },
+    "cmeel-boost-1.83.0-cp310-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/d5/8b/570d4003840fd5d6f4d2c13e51bf01221d4366a5381ab2db2d82c884711a/cmeel_boost-1.83.0-0-cp310-cp310-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_boost-1.83.0-0-cp310-cp310-manylinux_2_28_aarch64.whl", "sha256": "2abb8bd9d3856aada2ddad9c924d4139afa2308c1c53183e4710937d3ff83354", "size": 34523653, "root": "cmeel.prefix"
+    },
+    "console-bridge-1.0.2.3-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/50/a5/70e23c5570506bb39b56aa4d0f3a4a414e38082ddb33e86a48b546620121/cmeel_console_bridge-1.0.2.3-0-py3-none-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_console_bridge-1.0.2.3-0-py3-none-manylinux_2_28_x86_64.whl", "sha256": "5bb1115ed38441b2396e732e10ec63d1e68445674f9f5d321f7985eb10e9aeef", "size": 24477, "root": "cmeel.prefix"
+    },
+    "console-bridge-1.0.2.3-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/92/65/5741de6f550fe701d0780546d97b283306676315a3e1f379a6038e8c0ab0/cmeel_console_bridge-1.0.2.3-0-py3-none-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_console_bridge-1.0.2.3-0-py3-none-manylinux_2_28_aarch64.whl", "sha256": "372942e9c44f681bfff377fba25b348801283aa6f3826a00e4195089bda9737a", "size": 25762, "root": "cmeel.prefix"
+    },
+    "tinyxml-2.6.2.3-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/71/b1/4becb0e11e954e233e84e669216f103ef61857f228f7372aac58a189cd5f/cmeel_tinyxml-2.6.2.3-0-py3-none-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_tinyxml-2.6.2.3-0-py3-none-manylinux_2_28_x86_64.whl", "sha256": "fe4bddefce9832c2c5f6e75c1d8af2b8282127180eb3f2aecbd02f5f152bad94", "size": 62921, "root": "cmeel.prefix"
+    },
+    "tinyxml-2.6.2.3-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/17/d0/0b42a2ad594bbb8d074a4431931b742c51b1c572d75ee8b4fec2ad0eaa39/cmeel_tinyxml-2.6.2.3-0-py3-none-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_tinyxml-2.6.2.3-0-py3-none-manylinux_2_28_aarch64.whl", "sha256": "ecb6107a6777b5bc0339b8f7fb4a76c95958648382244ac44e278a3a05db37df", "size": 61837, "root": "cmeel.prefix"
+    },
+    "urdfdom-3.1.1.1-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/0e/78/4e80ead35f1664717ec6537154bee33ade82d5499057fa2d3ed811ee0565/cmeel_urdfdom-3.1.1.1-0-py3-none-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_urdfdom-3.1.1.1-0-py3-none-manylinux_2_28_x86_64.whl", "sha256": "83eafe0e494cd285b3a57805c72b12500d906586ff93a57a03d09a87d25ec62d", "size": 405139, "root": "cmeel.prefix"
+    },
+    "urdfdom-3.1.1.1-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/81/05/0a4f513d1fde41ab12e3609f97086c80bc0b21e1a35dbc62cb25327be07f/cmeel_urdfdom-3.1.1.1-0-py3-none-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_urdfdom-3.1.1.1-0-py3-none-manylinux_2_28_aarch64.whl", "sha256": "42faf8a6e7437a7c03e38dad07a65cace8bf77aa594acc58f87726178802771d", "size": 391849, "root": "cmeel.prefix"
+    },
+    "urdfdom-headers-1.1.0-cp311-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/66/ae/5ea4bd2d92b9e72a3c6a8b7addcbd5278c7a061a04269edbe9637aa05d0a/cmeel_urdfdom_headers-1.1.0-0-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_urdfdom_headers-1.1.0-0-cp311-cp311-manylinux_2_28_x86_64.whl", "sha256": "c274f1992c793374a8ec37695e488a31f4504907a4845328b2ac028907ce59e4", "size": 32972, "root": "cmeel.prefix"
+    },
+    "urdfdom-headers-1.1.0-cp38-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/79/e3/295fe72888813c459d775fcdd6f50551190f23ec2bf80e0063984d76ec03/cmeel_urdfdom_headers-1.1.0-0-cp38-cp38-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_urdfdom_headers-1.1.0-0-cp38-cp38-manylinux_2_28_aarch64.whl", "sha256": "e30373d3e8e7c84fda66525140759c72d4519bc9d79bf2f0f2380b1e651d7799", "size": 32978, "root": "cmeel.prefix"
+    },
+    "urdfdom-headers-1.1.0-cp310-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/d2/46/af36096d4901e9d0327c4ae3e39d6f7b70b5a2411b1ee19d25de8deb6235/cmeel_urdfdom_headers-1.1.0-0-cp310-cp310-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_urdfdom_headers-1.1.0-0-cp310-cp310-manylinux_2_28_aarch64.whl", "sha256": "6fb3c2bf89ce8a03142bbf1ffc0048810ee8742e3f5ac6bc1f4a8899e2827f7b", "size": 32978, "root": "cmeel.prefix"
+    },
+    "hpp-fcl-2.3.7-cp311-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/e0/41/8611c23999eaf7b01d08997c73896160a278fd6d5f0a23ce8dbaad704044/hpp_fcl-2.3.7-0-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "filename": "hpp_fcl-2.3.7-0-cp311-cp311-manylinux_2_28_x86_64.whl", "sha256": "9e115b2a7e69d562753c7b75110172d71798aa7c46f066c2b9ad30030a26abb2", "size": 2356685, "root": "cmeel.prefix"
+    },
+    "hpp-fcl-2.3.7-cp38-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/60/4b/1836f3dc5f5a19c60b5f8fb789f4774b8e54f3af26209063e9785eb4668f/hpp_fcl-2.3.7-0-cp38-cp38-manylinux_2_28_aarch64.whl",
+      "filename": "hpp_fcl-2.3.7-0-cp38-cp38-manylinux_2_28_aarch64.whl", "sha256": "5676ed6191d6fdb7e5499055d7da1cd38267fc4bf3c767ddd2276b81304dedcc", "size": 2297901, "root": "cmeel.prefix"
+    },
+    "hpp-fcl-2.3.7-cp310-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/d3/41/9c1a5f2403e22e767972a707c074d6d79ab6179a3e7bbeba0f503c7c4761/hpp_fcl-2.3.7-0-cp310-cp310-manylinux_2_28_aarch64.whl",
+      "filename": "hpp_fcl-2.3.7-0-cp310-cp310-manylinux_2_28_aarch64.whl", "sha256": "b6174ce5a648abc672b96a50d71a38b332571079831907b8a7060e3d521ee7d9", "size": 2297913, "root": "cmeel.prefix"
+    },
+    "eigenpy-3.1.4-cp311-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/e2/58/67395494cac460212d7082e8987a36b1536f0b0b034343e8019877b9c7d3/eigenpy-3.1.4-0-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "filename": "eigenpy-3.1.4-0-cp311-cp311-manylinux_2_28_x86_64.whl", "sha256": "e948b1b2bf6efe7bad92164f537991005ca61f1892b7504f7a58926505189b9a", "size": 2477419, "root": "cmeel.prefix"
+    },
+    "eigenpy-3.1.4-cp38-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/8e/e2/de736b99f959bc067c19f9571717d17b5809b7bca2b7a7b48d9196be67e3/eigenpy-3.1.4-0-cp38-cp38-manylinux_2_28_aarch64.whl",
+      "filename": "eigenpy-3.1.4-0-cp38-cp38-manylinux_2_28_aarch64.whl", "sha256": "9ce6f812a1d995cffad6a6586f331cf354c30417df78d486d4856922ecfe952f", "size": 2458817, "root": "cmeel.prefix"
+    },
+    "eigenpy-3.1.4-cp310-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/73/aa/9d3ddd1fa7942b1ec002cb548ed51f952fa43f8867057baca6f3739a1c0f/eigenpy-3.1.4-0-cp310-cp310-manylinux_2_28_aarch64.whl",
+      "filename": "eigenpy-3.1.4-0-cp310-cp310-manylinux_2_28_aarch64.whl", "sha256": "442225433adbf6e917a9e1b028f9300ac7bbe9b4b80194b475aa5659bf849c2f", "size": 2458653, "root": "cmeel.prefix"
+    },
+    "assimp-5.3.1-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/07/91/1e08871351e28ca5e5275f42add660f962ce3378e64c7c6dd985c9f1b286/cmeel_assimp-5.3.1-0-py3-none-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_assimp-5.3.1-0-py3-none-manylinux_2_28_x86_64.whl", "sha256": "0bcb4f649377632698de7a8a56a6bb9772aff2cccd8532b796e223ccb1e579d6", "size": 13959918, "root": "cmeel.prefix"
+    },
+    "assimp-5.3.1-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/a9/a1/0efa348c9dcdab49b81170a71ddd0aec23c76d09683d21223e7ceae561f3/cmeel_assimp-5.3.1-0-py3-none-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_assimp-5.3.1-0-py3-none-manylinux_2_28_aarch64.whl", "sha256": "c33678fcd7b35d4bdc9ccaac8311c05aaa6cb475d63eca4f83cc91c34d71ce41", "size": 13164839, "root": "cmeel.prefix"
+    },
+    "octomap-1.9.8.2-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/10/7f/a667582b51f2f52c6c053809e8b1a4c663d5495d9481c8ebed51b32e417d/cmeel_octomap-1.9.8.2-0-py3-none-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_octomap-1.9.8.2-0-py3-none-manylinux_2_28_x86_64.whl", "sha256": "f07ab209481ff5a9ad44d9d649bf3b04119e2947f9d52b16cf3e4408b7653e88", "size": 694982, "root": "cmeel.prefix"
+    },
+    "octomap-1.9.8.2-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/f5/6b/32d231464fa1100297dbb6a9b1940b6600c1db2c99a2d1d3c24294e3c5ac/cmeel_octomap-1.9.8.2-0-py3-none-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_octomap-1.9.8.2-0-py3-none-manylinux_2_28_aarch64.whl", "sha256": "0003eae2cd8ce1dee194a21350a9f6e9e0b3dec89a8a6f80ab4c6ff58986276d", "size": 671739, "root": "cmeel.prefix"
+    },
+    "qhull-8.0.2.1-x86_64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/b4/16/ef7b6201835ba2492753c9c91b266d047b6664507be42ec858e2b24673b5/cmeel_qhull-8.0.2.1-0-py3-none-manylinux_2_28_x86_64.whl",
+      "filename": "cmeel_qhull-8.0.2.1-0-py3-none-manylinux_2_28_x86_64.whl", "sha256": "c513abafa40e2b8eb7cd3640e3f92d5391fbd6ec0f4182dbf9536934d8a8ea3e", "size": 3194917, "root": "cmeel.prefix"
+    },
+    "qhull-8.0.2.1-aarch64": {
+      "kind": "wheel", "url": "https://files.pythonhosted.org/packages/0a/7c/74b5c781cbfc8e4a9bb73b71659cc595bc0163223fd700b18133dbcf2831/cmeel_qhull-8.0.2.1-0-py3-none-manylinux_2_28_aarch64.whl",
+      "filename": "cmeel_qhull-8.0.2.1-0-py3-none-manylinux_2_28_aarch64.whl", "sha256": "17f519106df79aed9fc5ec92833d4958d132d23021f02a78a9564cdf83a36c7c", "size": 3078962, "root": "cmeel.prefix"
+    }
+  },
+  "profiles": {
+    "linux-amd64": {
+      "system": "Linux",
+      "architecture": "x86_64",
+      "os_id": "ubuntu",
+      "os_version": "24.04",
+      "l4t_release": null,
+      "python": "3.11",
+      "cuda": "cpu",
+      "torch": "2.5.1+cpu",
+      "torch_cmake_version": "2.5.1",
+      "torch_artifact": "libtorch-linux-amd64-2.5.1-cpu",
+      "cmake_minimum": "3.20",
+      "cmake_tested": "3.28.3",
+      "gcc_tested": "13.3.0",
+      "glibc_tested": "2.39",
+      "cxx11_abi": 1,
+      "system_dependencies": {"eigen": "3.4.0", "yaml-cpp": "0.8.0"},
+      "source_dependencies": ["fmt-9.1.0", "spdlog-1.15.3"]
+      ,"runtime_dependencies": ["pin-2.6.21-cp311-x86_64", "cmeel-boost-1.83.0-cp311-x86_64", "console-bridge-1.0.2.3-x86_64", "tinyxml-2.6.2.3-x86_64", "urdfdom-3.1.1.1-x86_64", "urdfdom-headers-1.1.0-cp311-x86_64", "hpp-fcl-2.3.7-cp311-x86_64", "eigenpy-3.1.4-cp311-x86_64", "assimp-5.3.1-x86_64", "octomap-1.9.8.2-x86_64", "qhull-8.0.2.1-x86_64"]
+    },
+    "jetson-jp5": {
+      "system": "Linux",
+      "architecture": "aarch64",
+      "os_id": "ubuntu",
+      "os_version": "20.04",
+      "l4t_release": "35.3.1",
+      "python": "3.8",
+      "cuda": "11.4",
+      "cuda_arch": "8.7",
+      "cuda_standard": 14,
+      "torch": "2.1.0a0+41361538.nv23.06",
+      "torch_cmake_version": "2.1.0",
+      "torch_artifact": "torch-jetson-jp5-2.1",
+      "cmake_minimum": "3.16",
+      "cmake_tested": "3.16.3",
+      "gcc_tested": "9.4.0",
+      "glibc_tested": "2.31",
+      "cxx11_abi": 1,
+      "system_dependencies": {"eigen": "3.3.7", "yaml-cpp": "0.6.2", "unitree_sdk2": "discovered-read-only", "cyclonedds": "discovered-read-only"},
+      "unitree_sdk2_root": "/usr/local",
+      "unitree_sdk2_artifact": "unitree-sdk2-f29ee9f",
+      "source_dependencies": ["fmt-9.1.0", "spdlog-1.15.3"]
+      ,"runtime_dependencies": ["pin-2.6.21-cp38-aarch64", "cmeel-boost-1.83.0-cp38-aarch64", "console-bridge-1.0.2.3-aarch64", "tinyxml-2.6.2.3-aarch64", "urdfdom-3.1.1.1-aarch64", "urdfdom-headers-1.1.0-cp38-aarch64", "hpp-fcl-2.3.7-cp38-aarch64", "eigenpy-3.1.4-cp38-aarch64", "assimp-5.3.1-aarch64", "octomap-1.9.8.2-aarch64", "qhull-8.0.2.1-aarch64"]
+    },
+    "jetson-jp6": {
+      "system": "Linux",
+      "architecture": "aarch64",
+      "os_id": "ubuntu",
+      "os_version": "22.04",
+      "l4t_release": "36.4.3",
+      "python": "3.10",
+      "cuda": "12.6",
+      "cuda_arch": "8.7",
+      "cuda_standard": 17,
+      "torch": "2.8.0",
+      "torch_cmake_version": "2.8.0",
+      "torch_artifact": "torch-jetson-jp6-cu126-2.8.0",
+      "cmake_minimum": "3.22",
+      "cmake_tested": "3.22.1",
+      "gcc_tested": "11.4.0",
+      "glibc_tested": "2.35",
+      "cxx11_abi": 1,
+      "system_dependencies": {"eigen": "3.4.0", "yaml-cpp": "0.7.0", "unitree_sdk2": "discovered-read-only", "cyclonedds": "discovered-read-only"},
+      "unitree_sdk2_root": "/usr/local",
+      "unitree_sdk2_artifact": "unitree-sdk2-f29ee9f",
+      "source_dependencies": ["fmt-9.1.0", "spdlog-1.15.3"],
+      "runtime_dependencies": ["pin-2.6.21-cp310-aarch64", "cmeel-boost-1.83.0-cp310-aarch64", "console-bridge-1.0.2.3-aarch64", "tinyxml-2.6.2.3-aarch64", "urdfdom-3.1.1.1-aarch64", "urdfdom-headers-1.1.0-cp310-aarch64", "hpp-fcl-2.3.7-cp310-aarch64", "eigenpy-3.1.4-cp310-aarch64", "assimp-5.3.1-aarch64", "octomap-1.9.8.2-aarch64", "qhull-8.0.2.1-aarch64"]
+    }
+  }
+}
