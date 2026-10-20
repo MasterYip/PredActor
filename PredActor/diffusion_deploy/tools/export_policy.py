@@ -218,22 +218,21 @@ _DEPLOY_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def _default_urdf_path():
-    """Return an absolute path to a G1 URDF in the merged PegasusMoDye repo, or "".
+    """Return a bundled or merged-repo G1 URDF, or ``""`` when unavailable.
 
-    PDPlanner is a submodule of PegasusMoDye; the G1 URDF ships in RLTracker.
-    We walk up from diffusion_deploy/ looking for a sibling ``RLTracker``
-    (``../../RLTracker/...`` in the merged repo, ``../../../RLTracker/...`` in a
-    worktree under PegasusMoDye/worktrees/).  When no such repo layout is found
-    (standalone PDPlanner clone) we return "" so FK exports still require an
-    explicit --urdf-path.
+    The public PredActor export includes the asset under ``PredActor/assets``.
+    The development checkout keeps the same asset in RLTracker, so both layouts
+    are searched before requiring an explicit ``--urdf-path``.
     """
-    rel = (pathlib.Path("RLTracker") / "source" / "rl_tracker" / "rl_tracker"
-           / "assets" / "unitree_description" / "urdf" / "g1" / "main.urdf")
-    cur = _DEPLOY_ROOT.parent  # e.g. <repo>/PDPlanner  or <worktree-root>
+    public_rel = pathlib.Path("assets") / "unitree_description" / "urdf" / "g1" / "main.urdf"
+    dev_rel = (pathlib.Path("RLTracker") / "source" / "rl_tracker" / "rl_tracker"
+               / "assets" / "unitree_description" / "urdf" / "g1" / "main.urdf")
+    cur = _DEPLOY_ROOT.parent  # e.g. <repo>/PredActor or <repo>/PDPlanner
     for _ in range(5):
-        cand = cur / rel
-        if cand.is_file():
-            return str(cand)
+        for rel in (public_rel, dev_rel):
+            cand = cur / rel
+            if cand.is_file():
+                return str(cand)
         cur = cur.parent
     return ""
 
@@ -242,7 +241,7 @@ def _derive_deploy_args(actor_type, obs_dim, obs_profile, use_fk, urdf_path):
     """Resolve obs_profile / use_fk / urdf_path when the user did not pass them.
 
     Derivation rules (documented in the README):
-      * actor_type == "prdp"      → obs_profile "G1", use_fk false (paper PRDP contract)
+      * actor_type == "prdp"      → obs_profile "G1", use_fk true (192-D body + FK)
       * obs_dim == 96             → "G1_RLObs", no FK
       * obs_dim == 192            → "G1", FK
       * anything else             → genuinely ambiguous → require --obs-profile
@@ -265,7 +264,7 @@ def _derive_deploy_args(actor_type, obs_dim, obs_profile, use_fk, urdf_path):
 
     if use_fk is None:
         if actor_type == "prdp":
-            use_fk = False
+            use_fk = True
         elif obs_profile == "G1":
             use_fk = True
         elif obs_profile == "G1_RLObs":
@@ -424,7 +423,7 @@ def compute_ddpm_schedule(denoising_steps):
 def _enable_scalar_ddim(actor_cfg):
     """Return a deterministic scalar-DDIM export override.
 
-    Condition-embedding and fixed-plan reuse require scalar DDIM.
+    Task082's condition-embedding and fixed-plan reuse require scalar DDIM.
     The override is explicit so old exporter invocations continue to preserve
     the checkpoint sampler unchanged.
     """
@@ -1128,7 +1127,7 @@ def _write_deploy_config(output_dir, actor_cfg, norm_stats, backbone_path, sched
               help="Run the C++ actor under c10::InferenceMode in addition to no-grad")
 @click.option("--scalar-ddim", is_flag=True, default=False,
               help="Explicitly export deterministic scalar DDIM instead of the "
-                   "checkpoint's ns/rolling schedule; required by fixed-plan "
+                   "checkpoint's ns/rolling schedule; required by Task082 "
                    "condition-reuse and DDIM-plan optimizations")
 @click.option("--ddim-steps", type=click.IntRange(min=1), default=None,
               help="Override policy.actor.ddim_steps before reconstructing the "
@@ -1147,7 +1146,7 @@ def _write_deploy_config(output_dir, actor_cfg, norm_stats, backbone_path, sched
                    "Default: repo-relative RLTracker G1 URDF when found, else empty.")
 @click.option("--use-fk/--no-use-fk", default=None,
               help="Enable or disable FK in the generated deploy config. Default: "
-                   "derived (paper prdp→false, G1_RLObs→false; other G1 profiles→true).")
+                   "derived (G1/prdp→true, G1_RLObs→false).")
 @click.option("--write-actor-config", is_flag=True, default=False,
               help="Debug: also dump actor_config.yaml (root key `actor:`). The C++ "
                    "runtime does NOT read this file; the deploy config is the single "

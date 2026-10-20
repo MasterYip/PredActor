@@ -202,11 +202,9 @@ mouse perturbations or `--web-port 8766` to use another port.
 ### Deployment (Experimental)
 
 The `PredActor/diffusion_deploy/` directory contains the C++ runtime, exporter,
-G1 assets, platform lock, and launch scripts. Read the
-[deployment quickstart](docs/deployment.md) for export, build, and the three
-routes: [MuJoCo sim2sim](docs/deployment.md#mujoco-sim2sim),
-[wired G1](docs/deployment.md#wired-g1), and
-[onboard G1](docs/deployment.md#onboard-g1).
+G1 assets, platform lock, and launch scripts. Read the single
+[deployment guide](PredActor/diffusion_deploy/doc/DEPLOYMENT.md) for export,
+build, MuJoCo sim2sim, wired G1, onboard G1, and joystick operation.
 
 The paper defaults use G1, FP32, DDIM-2, and no FK for the PRDP policy. Exported
 policy bundles and learned weights are supplied separately.
@@ -218,6 +216,29 @@ PYTHONNOUSERSITE=1 PYTHONPATH=.. python tools/export_policy.py \
   --output models/my_policy --mode backbone --target native \
   --obs-profile G1 --no-use-fk --deploy-config deploy_config.yaml --gui
 ./build.sh --backend torch --download-runtime auto --with-sdk2 --jobs 4
+```
+
+### Unified joystick
+
+The unified interface reads one command source in-process. A local Xbox
+controller at `/dev/input/js0` uses the left stick for `vx`/`vy`, the right
+stick for `wz`, and the D-pad for `stand`, `walk`, `jog`, and `squat down`.
+LB toggles whole-body guidance; L2 selects the configured guidance gain; L3
+toggles `vx`/`vy`; and R3 toggles `wz`. The same reader can consume the
+Unitree wireless bytes from LowState on a wired or onboard run.
+
+```bash
+cd PredActor/diffusion_deploy
+./scripts/run.sh --config models/my_policy/deploy_config.yaml \
+  --fsm-config models/my_policy/fsm_config.yaml --device cuda:0 \
+  --mode control --unified-command --command-source joydev \
+  --command-device /dev/input/js0 --command-mapping xbox_new
+```
+
+For an SSH-only session, the optional read-only status listener uses a TUI:
+
+```bash
+python tools/unified_command_dashboard.py --host 127.0.0.1 --port 9880 --mode tui
 ```
 
 ### Train the motion encoder (Experimental)
