@@ -128,7 +128,8 @@ offline validation checks before enabling the robot:
 
 ```bash
 ./scripts/verify_model_resources.sh --resource-dir ~/CodeSpace/models/my_policy --require-text
-~/CodeSpace/PredActor/build/run_g1_robot \
+RELEASE=~/CodeSpace/PredActor/install/diffusion-deploy/releases/<source-commit>
+"$RELEASE/bin/run_g1_robot" \
   --config ~/CodeSpace/models/my_policy/deploy_config.yaml \
   --mode offline --validate-config --device cuda:0
 ```
