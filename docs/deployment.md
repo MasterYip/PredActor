@@ -35,6 +35,6 @@ use `--command-source unitree_lowstate`:
 ```
 
 Onboard installation is documented in
-`PredActor/diffusion_deploy/doc/G1OnboardDeployDoc/PUBLIC_ONBOARD.md`.
+[Onboard Installation Guide](../PredActor/diffusion_deploy/doc/G1OnboardDeployDoc/PUBLIC_ONBOARD.md).
 Checkpoint artifacts are published separately at
 [MasterYip/PredActor_Artifacts](https://huggingface.co/MasterYip/PredActor_Artifacts).
