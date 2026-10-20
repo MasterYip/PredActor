@@ -19,24 +19,40 @@
   <img src="docs/assets/institution-strip.svg" width="100%" alt="Harbin Institute of Technology, Shanghai Innovation Institute, RoboParty Lab, Tsinghua University, Shanghai Jiao Tong University, HexLab, and SFTR">
 </p>
 
-> [!IMPORTANT]
+<!-- > [!IMPORTANT]
 > Evaluation, data collection, MotionCLIP labeling, and BC training code are
 > available. The diffusion-deploy source and release runbooks are included;
-> deployed policy packages are supplied separately.
+> deployed policy packages are supplied separately. -->
+
+<!-- <details>
+<summary>Project preview</summary>
+</details> -->
 
 ## Get started
 
-The quickest way to use this repository is to ask for one of these concrete
+The quickest way to use this repository is to ask **coding agent** for one of these concrete
 workflows:
 
-1. **Quick evaluation:** “Install PredActor and run the quick evaluation for
-   me.” Follow [Quick evaluation](#quick-evaluation).
-2. **Collection and training:** “Install the data collection module and run the
-   152-motion collection, dyeing, and training example.” Follow
-   [Reproduce collection and training](#reproduce-collection-and-training).
-3. **Deployment:** “Deploy the released checkpoint in MuJoCo, or on a wired/onboard
-   Unitree G1, using the deployment guide.” Follow
-   [Deployment](#deployment) and choose the requested route.
+1. **Quick evaluation:**
+
+   ```text
+   “Install PredActor and run the quick evaluation for me.”
+   ```
+   <!-- Follow [Quick evaluation](#quick-evaluation). -->
+
+2. **Collection and training:**
+
+   ```text
+   “Install the data collection module and run the 152-motion collection, dyeing, and training example.” 
+   ```
+   <!-- Follow [Reproduce collection and training](#reproduce-collection-and-training). -->
+
+3. **Deployment:**
+
+   ```text
+   “Deploy the released checkpoint in MuJoCo, or on a wired/onboard Unitree G1, using the deployment guide.”
+   ```
+   <!-- Follow [Deployment](#deployment) and choose the requested route. -->
 
 The [agent and contributor guide](docs/agent_sop.md) is a compact index for
 coding agents. It complements the detailed human guides below.
@@ -53,19 +69,41 @@ predactor-agent-hints:
   remote_publish_requires_owner_confirmation: true
 -->
 
+---
+
 ## Overview
 
-PredActor augments action diffusion with an internal future-state trajectory for
-look-ahead guidance while retaining direct action execution. It combines
-classifier guidance on predicted states with classifier-free text conditioning,
-using proprioceptive history at runtime and sending the selected action
-directly to the controller.
+<p align="center">
+  <a href="https://masteryip.github.io/predactor.github.io/">
+    <img src="./docs/assets/predactor-preview.png" width="80%" alt="PredActor humanoid control project preview">
+  </a>
+</p>
 
-The repository is organized around five reader paths: quick evaluation, data
-collection, training, model evaluation, and deployment. The release checklist
-below shows what is currently available.
+PredActor augments action diffusion with an internal future-state trajectory for look-ahead guidance while retaining direct action execution. It combines classifier guidance on predicted states with classifier-free text conditioning, using proprioceptive history at runtime and sending the selected action directly to the controller.
 
-## Quick evaluation
+The repository is organized around five reader paths: quick evaluation, data collection, training, model evaluation, and deployment. The release checklist below shows what is currently available.
+
+**At a glance**
+
+- **Predictive direct control:** jointly predicts future states and actions, keeps states internal, and executes the selected action without a separate motion-reference tracker.
+- **Proprioceptive inputs:** conditions on onboard proprioceptive history without requiring externally estimated full-body states as policy inputs.
+- **CG and CFG steering:** combines test-time objectives on predicted states with learned behavior conditioning.
+- **Rolling onboard inference:** reuses the denoising horizon across control ticks and optimizes runtime for 50 Hz operation on Jetson Orin NX.
+- **Simulation and hardware demos:** demonstrates commands, transitions, steering, and disturbance response.
+
+**Release checklist**
+
+- [x] **Evaluation:** browser-based MuJoCo evaluation, G1 assets, and published checkpoints.
+- [x] **Data collection and labeling:** IsaacLab motion collection and MotionCLIP dataset labeling tools.
+- [x] **BC training:** behavior-cloning training code, configurations, and reproducibility smoke test.
+- [x] **Deployment:** diffusion-deploy source, G1 assets, export tooling, and runbooks.
+- [ ] **DAgger:** interactive data aggregation and policy refinement pipeline.
+
+---
+
+## Usage Guide
+
+### Quick Evaluation
 
 Install [uv](https://docs.astral.sh/uv/), then run these commands on Linux:
 
@@ -89,7 +127,7 @@ For a headless startup, use `uv run --locked predactor-eval --headless
 --web-no-browser`. Run `uv run --locked predactor-eval --help` for optional
 checkpoint, config, device, and Web UI overrides.
 
-## Reproduce collection and training
+### Data Collection and Auto Labeling
 
 Download the default set of 152 G1 motion trajectories, RLTracker checkpoint,
 and G1 MotionCLIP checkpoint:
@@ -111,7 +149,11 @@ bash PredActor/collection/collect_dataset.sh \
 # Return to the repository uv environment, dye the collected trajectories, then train
 conda deactivate
 uv run python PredActor/collection/scripts/data_dyeing/data_dyeing.py
+```
 
+### Behavior Clone Training
+
+```bash
 # Train the text-conditioned policy
 uv run python PredActor/train.py \
   --cfg g1prdp_cond_diffuse.yaml --exp_name predactor_bc \
@@ -141,7 +183,7 @@ Artifact placement and environment details are in the
 [training](docs/training.md), and
 [motion encoder](docs/motion_encoder.md) guides.
 
-## Evaluate your trained model
+### Mujoco Evaluation
 
 Set `run_dir` to the directory printed by training:
 
@@ -157,22 +199,7 @@ uv run --locked predactor-eval \
 Open `http://127.0.0.1:8765/` to control the model. Add `--web-perturb` for
 mouse perturbations or `--web-port 8766` to use another port.
 
-## Train the motion encoder (Experimental)
-
-Train G1 MotionCLIP with the original G1 xyz recipe: G1-retargeted AMASS motions,
-BABEL labels, and a trainable CLIP text encoder. Follow the
-[motion encoder guide](docs/motion_encoder.md) to prepare the training database,
-then run from the repository root:
-
-```bash
-uv run --locked bash PredActor/motion_encoder/scripts/train_g1_xyz.sh
-```
-
-This runs 100 epochs with 16 data-loader workers and writes
-`PredActor/motion_encoder/exps/g1-model-xyz-clip/checkpoint_0100.pth.tar`.
-It does not initialize from the released MotionCLIP checkpoint.
-
-## Deployment
+### Deployment (Experimental)
 
 The `PredActor/diffusion_deploy/` directory contains the C++ runtime, exporter,
 G1 assets, platform lock, and launch scripts. Read the
@@ -193,32 +220,22 @@ PYTHONNOUSERSITE=1 PYTHONPATH=.. python tools/export_policy.py \
 ./build.sh --backend torch --download-runtime auto --with-sdk2 --jobs 4
 ```
 
-<details>
-<summary>Project preview</summary>
+### Train the motion encoder (Experimental)
 
-<p align="center">
-  <a href="https://masteryip.github.io/predactor.github.io/">
-    <img src="./docs/assets/predactor-preview.png" width="100%" alt="PredActor humanoid control project preview">
-  </a>
-</p>
+Train G1 MotionCLIP with the original G1 xyz recipe: G1-retargeted AMASS motions,
+BABEL labels, and a trainable CLIP text encoder. Follow the
+[motion encoder guide](docs/motion_encoder.md) to prepare the training database,
+then run from the repository root:
 
-</details>
+```bash
+uv run --locked bash PredActor/motion_encoder/scripts/train_g1_xyz.sh
+```
 
-### At a glance
+This runs 100 epochs with 16 data-loader workers and writes
+`PredActor/motion_encoder/exps/g1-model-xyz-clip/checkpoint_0100.pth.tar`.
+It does not initialize from the released MotionCLIP checkpoint.
 
-- **Predictive direct control:** jointly predicts future states and actions, keeps states internal, and executes the selected action without a separate motion-reference tracker.
-- **Proprioceptive inputs:** conditions on onboard proprioceptive history without requiring externally estimated full-body states as policy inputs.
-- **CG and CFG steering:** combines test-time objectives on predicted states with learned behavior conditioning.
-- **Rolling onboard inference:** reuses the denoising horizon across control ticks and optimizes runtime for 50 Hz operation on Jetson Orin NX.
-- **Simulation and hardware evidence:** demonstrates commands, transitions, steering, and disturbance response.
-
-**Release checklist**
-
-- [x] **Evaluation:** browser-based MuJoCo evaluation, G1 assets, and published checkpoints.
-- [x] **Data collection and labeling:** IsaacLab motion collection and MotionCLIP dataset labeling tools.
-- [x] **BC training:** behavior-cloning training code, configurations, and reproducibility smoke test.
-- [ ] **DAgger:** interactive data aggregation and policy refinement pipeline.
-- [x] **Deployment:** diffusion-deploy source, G1 assets, export tooling, and runbooks.
+---
 
 ## Demos
 
