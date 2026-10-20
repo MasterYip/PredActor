@@ -16,7 +16,7 @@ checkpoint. The checkpoint-embedded configuration is the default. For the
 paper PRDP profile, use the G1 observation contract with FK disabled:
 
 ```bash
-cd /path/to/PegasusMoDye/PDPlanner/diffusion_deploy
+cd /path/to/PredActor/PredActor/diffusion_deploy
 PYTHONNOUSERSITE=1 PYTHONPATH=.. python tools/export_policy.py \
   --checkpoint /absolute/path/to/checkpoint.ckpt \
   --config checkpoint \
