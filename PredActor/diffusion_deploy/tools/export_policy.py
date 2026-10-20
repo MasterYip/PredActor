@@ -423,7 +423,7 @@ def compute_ddpm_schedule(denoising_steps):
 def _enable_scalar_ddim(actor_cfg):
     """Return a deterministic scalar-DDIM export override.
 
-    Task082's condition-embedding and fixed-plan reuse require scalar DDIM.
+    Condition-embedding and fixed-plan reuse require scalar DDIM.
     The override is explicit so old exporter invocations continue to preserve
     the checkpoint sampler unchanged.
     """
@@ -1127,7 +1127,7 @@ def _write_deploy_config(output_dir, actor_cfg, norm_stats, backbone_path, sched
               help="Run the C++ actor under c10::InferenceMode in addition to no-grad")
 @click.option("--scalar-ddim", is_flag=True, default=False,
               help="Explicitly export deterministic scalar DDIM instead of the "
-                   "checkpoint's ns/rolling schedule; required by Task082 "
+                   "checkpoint's ns/rolling schedule; required by fixed-plan "
                    "condition-reuse and DDIM-plan optimizations")
 @click.option("--ddim-steps", type=click.IntRange(min=1), default=None,
               help="Override policy.actor.ddim_steps before reconstructing the "

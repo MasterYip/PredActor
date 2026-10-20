@@ -9,6 +9,54 @@ G1. The runtime reads the generated `deploy_config.yaml`; keep that file,
 The released checkpoint and optional deployment bundles are distributed from
 the [PredActor artifacts repository](https://huggingface.co/MasterYip/PredActor_Artifacts).
 
+## Quick launch with the released bundle
+
+If you only want to run the published deployment, download the pre-exported
+bundle into `models/released`. It contains the backbone, deploy and FSM YAML
+files, schedules, robot asset, command latents, and checksums; no Python export
+step is needed.
+
+```bash
+cd /path/to/PredActor
+hf download MasterYip/PredActor_Artifacts \
+  deployment/predactor/latest --repo-type model \
+  --local-dir PredActor/diffusion_deploy/models/released
+cd PredActor/diffusion_deploy
+./scripts/verify_model_resources.sh \
+  --resource-dir models/released --require-text
+```
+
+Start Unitree MuJoCo in one terminal:
+
+```bash
+cd /path/to/PredActor/PredActor/diffusion_deploy
+./deps/unitree_mujoco/simulate/build/unitree_mujoco -r g1 -i 0 --camera-follow
+```
+
+In a second terminal, launch the policy over loopback DDS:
+
+```bash
+cd /path/to/PredActor/PredActor/diffusion_deploy
+./scripts/run.sh --config models/released/deploy_config.yaml \
+  --fsm-config models/released/fsm_config.yaml --device cuda:0 \
+  --mode control --unified-command --command-source joydev \
+  --command-device /dev/input/js0 --command-mapping xbox_new
+```
+
+For a wired G1, set the robot Ethernet interface in
+`models/released/deploy_config.yaml`, validate once, then launch through
+Unitree LowState:
+
+```bash
+cd /path/to/PredActor/PredActor/diffusion_deploy
+./scripts/run.sh --config models/released/deploy_config.yaml \
+  --fsm-config models/released/fsm_config.yaml --device cuda:0 \
+  --mode offline --validate-config
+./scripts/run.sh --config models/released/deploy_config.yaml \
+  --fsm-config models/released/fsm_config.yaml --device cuda:0 \
+  --mode control --unified-command --command-source unitree_lowstate
+```
+
 ## 1. Export a policy
 
 Run the exporter in the Python environment used to train or evaluate the

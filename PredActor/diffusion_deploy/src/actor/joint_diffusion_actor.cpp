@@ -62,7 +62,7 @@ JointDiffusionActor::JointDiffusionActor(const std::string& backbone_path,
                 optimized_methods_verified_ = true;
             } catch (const c10::Error&) {
                 throw std::runtime_error(
-                    "condition_embedding_reuse=true requires a Task082 artifact "
+                    "condition_embedding_reuse=true requires a compatible artifact "
                     "with build_condition_embeddings and forward_encoded_condition methods");
             }
         }
@@ -150,7 +150,7 @@ void JointDiffusionActor::build_ddim_plan() {
         // prefix clean-time embeddings, including no_state_override=true where
         // the prefix values themselves remain denoised.  This distinction was
         // previously hidden by the NS-DDIM production path and is observable
-        // for the Task083 scalar-DDIM export.
+        // for the scalar-DDIM export.
         plan.state_t_denoise.narrow(1, 0, cfg_.n_obs_steps).fill_(0);
         if (!cfg_.no_state_override) {
             plan.state_t_prev_denoise.narrow(1, 0, cfg_.n_obs_steps).fill_(0);
@@ -163,7 +163,7 @@ torch::Tensor JointDiffusionActor::build_condition_embeddings(
     const torch::Tensor& condition) {
     RECORD_FUNCTION("task142::condition_encoding", std::vector<c10::IValue>());
     if (!optimized_methods_verified_)
-        throw std::runtime_error("Task082 condition methods were not verified");
+        throw std::runtime_error("Condition methods were not verified");
     timeline_mark("actor/condition_embedding_start");
     auto result = backbone_.get_method("build_condition_embeddings")({condition});
     timeline_mark("actor/condition_embedding_end");
