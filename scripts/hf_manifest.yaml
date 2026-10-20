@@ -85,6 +85,52 @@ entries:
     enabled: true
     notes: 152 retargeted Unitree G1 trajectories used by collection, dyeing, and PDP051-style BC training
 
+  - hf_path: deployment/predactor/latest
+    local_path: Artifacts/deployment/predactor/latest
+    kind: directory
+    enabled: true
+    notes: Pre-exported deployment bundle for the released policy
+    files:
+      actor_compatibility.json:
+        size_bytes: 2323
+        sha256: 32063230eaf58413de9dc8dad657b4fbfb2583b1a5f5404938ec530ad3198a21
+      assets/g1.urdf:
+        size_bytes: 40589
+        sha256: dbc8471004e9b0b85c27a4ebc1f0d90a727c1cf7ca9ef507b805596f2004d64b
+      command_latents/jog.f32:
+        size_bytes: 2048
+        sha256: 47ef65dc95c1aed606f727040453d5f42464d4d7d45a42e1d53c4e228c96a215
+      command_latents/squat_down.f32:
+        size_bytes: 2048
+        sha256: 770af137becac1a8d164887a1e30dd168e64fa8cdffa59c4bb8f1307b1cca4c8
+      command_latents/stand.f32:
+        size_bytes: 2048
+        sha256: 01b0d52b4825ee602b6070da608fba4c9fd14f303ab6d25e773d7cd99502d551
+      command_latents/walk.f32:
+        size_bytes: 2048
+        sha256: 3a654cdb29c82e9f3104f7f48c0b2a6bbeb12fc529e857ffd2833d51e6bbb8f1
+      ddpm_schedule.pt:
+        size_bytes: 3953
+        sha256: 6bbd44e0b01dd0e429a6a54b0c3d1cb9cdfc1478911b04e9b0f99a2e5d356f38
+      deploy_config.yaml:
+        size_bytes: 45560
+        sha256: e6614160342d7ebf43ea22714fb9b5dc3ca3170d6aee9284291710f86f1951b9
+      emphasis_matrices.pt:
+        size_bytes: 592333
+        sha256: 9e301e178c31e8f4a6fb17dca900a5a53098e81b69889689ae48fe4bab0bfcb7
+      fsm_config.yaml:
+        size_bytes: 6763
+        sha256: 5cd8718dc103fcf4cb58b79afb528c5b057d81f7d634e2c81ccf8a257517845e
+      g1_policy_backbone.pt:
+        size_bytes: 12055482
+        sha256: d9992b136da6d6b74ca3c6692e3f10414e37c307773a6d1079f047c584a5c649
+      resource_manifest.yaml:
+        size_bytes: 2893
+        sha256: d0267843bc287527e961141b0bb2c10ac76cfaecb8712d85fa4071be89906a85
+      wbg_contract.yaml:
+        size_bytes: 796
+        sha256: fb733f3ad02677f3355a741bb5e2e5f60c99c6c6ba4cc8c131bd936ef4752512
+
   - hf_path: dataset
     local_path: Artifacts/dataset
     kind: directory

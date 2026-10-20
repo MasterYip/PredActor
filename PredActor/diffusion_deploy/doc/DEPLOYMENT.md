@@ -12,18 +12,16 @@ the [PredActor artifacts repository](https://huggingface.co/MasterYip/PredActor_
 ## Quick launch with the released bundle
 
 If you only want to run the published deployment, download the pre-exported
-bundle into `models/released`. It contains the backbone, deploy and FSM YAML
-files, schedules, robot asset, command latents, and checksums; no Python export
-step is needed.
+bundle into `Artifacts/deployment/predactor/latest`. It contains the backbone,
+deploy and FSM YAML files, schedules, robot asset, command latents, and
+checksums; no Python export step is needed.
 
 ```bash
 cd /path/to/PredActor
-hf download MasterYip/PredActor_Artifacts \
-  deployment/predactor/latest --repo-type model \
-  --local-dir PredActor/diffusion_deploy/models/released
+uv run --locked python scripts/hf_download.py --filter deployment/predactor/latest
 cd PredActor/diffusion_deploy
 ./scripts/verify_model_resources.sh \
-  --resource-dir models/released --require-text
+  --resource-dir ../../Artifacts/deployment/predactor/latest --require-text
 ```
 
 Start Unitree MuJoCo in one terminal:
@@ -37,8 +35,8 @@ In a second terminal, launch the policy over loopback DDS:
 
 ```bash
 cd /path/to/PredActor/PredActor/diffusion_deploy
-./scripts/run.sh --config models/released/deploy_config.yaml \
-  --fsm-config models/released/fsm_config.yaml --device cuda:0 \
+./scripts/run.sh --config ../../Artifacts/deployment/predactor/latest/deploy_config.yaml \
+  --fsm-config ../../Artifacts/deployment/predactor/latest/fsm_config.yaml --device cuda:0 \
   --mode control --unified-command --command-source joydev \
   --command-device /dev/input/js0 --command-mapping xbox_new
 ```
@@ -49,11 +47,11 @@ Unitree LowState:
 
 ```bash
 cd /path/to/PredActor/PredActor/diffusion_deploy
-./scripts/run.sh --config models/released/deploy_config.yaml \
-  --fsm-config models/released/fsm_config.yaml --device cuda:0 \
+./scripts/run.sh --config ../../Artifacts/deployment/predactor/latest/deploy_config.yaml \
+  --fsm-config ../../Artifacts/deployment/predactor/latest/fsm_config.yaml --device cuda:0 \
   --mode offline --validate-config
-./scripts/run.sh --config models/released/deploy_config.yaml \
-  --fsm-config models/released/fsm_config.yaml --device cuda:0 \
+./scripts/run.sh --config ../../Artifacts/deployment/predactor/latest/deploy_config.yaml \
+  --fsm-config ../../Artifacts/deployment/predactor/latest/fsm_config.yaml --device cuda:0 \
   --mode control --unified-command --command-source unitree_lowstate
 ```
 
