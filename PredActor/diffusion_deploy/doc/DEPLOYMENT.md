@@ -18,7 +18,7 @@ checksums; no Python export step is needed.
 
 ```bash
 cd /path/to/PredActor
-uv run --locked python scripts/hf_download.py --filter deployment/predactor/latest
+uv run --locked python scripts/hf_download.py --filter checkpoints/deployment
 cd PredActor/diffusion_deploy
 ./scripts/verify_model_resources.sh \
   --resource-dir ../../Artifacts/deployment/predactor/latest --require-text

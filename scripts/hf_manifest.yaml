@@ -85,7 +85,7 @@ entries:
     enabled: true
     notes: 152 retargeted Unitree G1 trajectories used by collection, dyeing, and PDP051-style BC training
 
-  - hf_path: deployment/predactor/latest
+  - hf_path: checkpoints/deployment/pdp067_standard2_full_jp5_ddim2
     local_path: Artifacts/deployment/predactor/latest
     kind: directory
     enabled: true
