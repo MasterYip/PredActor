@@ -220,6 +220,25 @@ PY
   DOWNLOAD_RUNTIME="none"
 fi
 
+# A fresh public checkout can build SDK2 from the pinned local submodule.
+# Jetson locked profiles use their checksum-pinned bootstrap above instead.
+if [[ "${USE_UNITREE_SDK2}" == "ON" && -z "${JETSON_LOCKED_PROFILE}" \
+      && -z "${UNITREE_SDK2_PATH:-}" \
+      && -f "${PROJECT_ROOT}/deps/unitree_sdk2/CMakeLists.txt" ]]; then
+  LOCAL_SDK2_SOURCE="${PROJECT_ROOT}/deps/unitree_sdk2"
+  LOCAL_SDK2_PREFIX="${PROJECT_ROOT}/deps/.build/unitree_sdk2-install"
+  LOCAL_SDK2_BUILD="${PROJECT_ROOT}/deps/.build/unitree_sdk2-build"
+  if [[ ! -f "${LOCAL_SDK2_PREFIX}/lib/cmake/unitree_sdk2/unitree_sdk2Config.cmake" ]]; then
+    print_info "Building the local Unitree SDK2 submodule"
+    cmake -S "${LOCAL_SDK2_SOURCE}" -B "${LOCAL_SDK2_BUILD}" \
+      -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX="${LOCAL_SDK2_PREFIX}"
+    cmake --build "${LOCAL_SDK2_BUILD}" --target install -j "${JOBS}"
+  fi
+  EXTRA_CMAKE_ARGS+=("-DUNITREE_SDK2_PATH=${LOCAL_SDK2_PREFIX}")
+  EXTRA_CMAKE_ARGS+=("-DUNITREE_CYCLONEDDS_PATH=${LOCAL_SDK2_PREFIX}")
+fi
+
 if [[ "${DOWNLOAD_RUNTIME}" != "none" ]]; then
   print_info "Preparing runtime dependencies (${DOWNLOAD_RUNTIME})"
   "${SCRIPT_DIR}/download_inference_runtime.sh" "${PROJECT_ROOT}/third_party/inference_runtime" "${DOWNLOAD_RUNTIME}"
