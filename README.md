@@ -372,8 +372,8 @@ The contents of this repository are released under the [MIT License](LICENSE), u
   <tr>
     <td width="50%" align="center" valign="top">
       <strong>PredActor WeChat group</strong><br><br>
-      <a href="docs/assets/community/wechat-group-20261020.png"><img src="docs/assets/community/wechat-group-20261020.png" width="240" alt="PredActor WeChat discussion group QR code, valid through October 20, 2026"></a><br>
-      <sub>Valid through October 20, 2026.</sub>
+      <a href="docs/assets/community/wechat-group-20261027.png"><img src="docs/assets/community/wechat-group-20261027.png" width="240" alt="PredActor WeChat discussion group QR code, valid through October 27, 2026"></a><br>
+      <sub>Valid through October 27, 2026.</sub>
     </td>
     <td width="50%" align="center" valign="top">
       <strong>Contact Author</strong><br><br>
