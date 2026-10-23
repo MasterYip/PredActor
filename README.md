@@ -201,6 +201,9 @@ mouse perturbations or `--web-port 8766` to use another port.
 
 ### Deployment (Experimental)
 
+> [!WARNING]
+> The deployment path is experimental. Please perform pre-deployment evaluation and testing in MuJoCo before attempting to run on the physical G1.
+
 The `PredActor/diffusion_deploy/` directory contains the C++ runtime, exporter,
 G1 assets, platform lock, and launch scripts. Read the single
 [deployment guide](PredActor/diffusion_deploy/doc/DEPLOYMENT.md) for export,
@@ -218,7 +221,7 @@ PYTHONNOUSERSITE=1 PYTHONPATH=.. python tools/export_policy.py \
 ./build.sh --backend torch --download-runtime auto --with-sdk2 --jobs 4
 ```
 
-### Unified joystick
+**Joystick Interface**
 
 The unified interface reads one command source in-process. A local Xbox
 controller at `/dev/input/js0` uses the left stick for `vx`/`vy`, the right
